@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  /* scroll-behavior: smooth; Removed to prevent conflict with Lenis */
+}
+
+/* Offset for fixed navbar during scroll navigation */
+section[id],
+div[id] {
+  scroll-margin-top: 76px;
+}
+
+:root {
+  --background: #070B14;
+  --foreground: #FFFFFF;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Times New Roman', Times, serif !important;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+.display-font {
+  font-family: 'Times New Roman', Times, serif !important;
+}
+
+/* Custom Scrollbar for Main Page */
+body::-webkit-scrollbar {
+  width: 8px;
+}
+
+body::-webkit-scrollbar-track {
+  background: #070B14;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: #111827;
+  border-radius: 4px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: #019E88;
+}
+
+/* Custom Scrollbar for Light Panels & Modals */
+.custom-scrollbar-light::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar-light::-webkit-scrollbar-track {
+  background: #F1F5F9; /* slate-100 */
+}
+
+.custom-scrollbar-light::-webkit-scrollbar-thumb {
+  background: #CBD5E1; /* slate-300 */
+  border-radius: 3px;
+}
+
+.custom-scrollbar-light::-webkit-scrollbar-thumb:hover {
+  background: #019E88; /* brand-teal */
+}
+
+.custom-scrollbar-light {
+  scrollbar-width: thin;
+  scrollbar-color: #CBD5E1 #F1F5F9;
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.glass-panel-strong {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Glow Effects */
+.glow-teal {
+  box-shadow: 0 0 30px rgba(0, 191, 165, 0.4), 0 0 60px rgba(0, 191, 165, 0.2);
+}
+
+.glow-gold {
+  box-shadow: 0 0 20px rgba(212, 168, 67, 0.3), 0 0 40px rgba(212, 168, 67, 0.1);
+}
+
+/* Text Gradients */
+.text-gradient-teal {
+  background: linear-gradient(135deg, #019E88 0%, #017C6B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #D4A843 0%, #a67c00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Ambient Backgrounds */
+.ambient-glow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle at center, rgba(0, 191, 165, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}

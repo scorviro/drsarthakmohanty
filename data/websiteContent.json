@@ -1,0 +1,37 @@
+{
+  "translations": {
+    "en": {
+      "hero": {
+        "trusted": "Rajkot's Most Trusted ",
+        "oncologist": "Radiation Oncologist",
+        "description": "15+ years of precision cancer care. State-of-the-art radiotherapy at HCG Hospital, Rajkot — serving all of Saurashtra with compassion and hope."
+      },
+      "about": {
+        "desc1": "Dr. Sarthak Kumar Mohanty is a Senior Consultant Radiation Oncologist at HCG Cancer Centre, Rajkot — with over 15 years of focused experience in treating complex malignancies using the most advanced radiotherapy technologies available in India.",
+        "desc2": "Trained at the prestigious Acharya Harihar Regional Cancer Centre (AHRCC), Cuttack — one of India's top radiation oncology centres — Dr. Sarthak brings world-class expertise to every patient he treats."
+      }
+    },
+    "hi": {
+      "hero": {
+        "trusted": "राजकोट के सबसे विश्वसनीय",
+        "oncologist": "रेडिएशन ऑन्कोलॉजिस्ट",
+        "description": "15+ वर्षों की सटीक कैंसर देखभाल। एचसीजी अस्पताल, राजकोट में अत्याधुनिक रेडियोथेरेपी - पूरे सौराष्ट्र की करुणा और आशा के साथ सेवा।"
+      },
+      "about": {
+        "desc1": "डॉ. सार्थक कुमार मोहंटी राजकोट के एचसीजी कैंसर सेंटर में सीनियर कंसलटेंट रेडिएशन ऑन्कोलॉजिस्ट हैं - भारत में उपलब्ध सबसे उन्नत रेडियोथेरेपी तकनीकों का उपयोग करके जटिल विकृतियों के इलाज में 15 से अधिक वर्षों का अनुभव रखते हैं।",
+        "desc2": "प्रतिष्ठित आचार्य हरिहर क्षेत्रीय कैंसर केंद्र (एएचआरसीसी), कटक से प्रशिक्षित डॉ. सार्थक हर मरीज के लिए विश्वस्तरीय विशेषज्ञता लाते हैं।"
+      }
+    },
+    "gu": {
+      "hero": {
+        "trusted": "રાજકોટના સૌથી વિશ્વસનીય",
+        "oncologist": "રેડિયેશન ઓન્કોલોજિસ્ટ",
+        "description": "15+ વર્ષની કેન્સર કેરનો અનુભવ. એચસીજી હોસ્પિટલ, રાજકોટ ખાતે અત્યાધુનિક રેડિયોથેરાપી - સમગ્ર સૌરાષ્ટ્રના દર્દીઓની સેવામાં સમર્પિત."
+      },
+      "about": {
+        "desc1": "ડો. સાર્થક કુમાર મોહંતી રાજકોટના એચસીજી કેન્સર સેન્ટર ખાતે સિનિયર કન્સલ્ટન્ટ રેડિયેશન ઓન્કોલોજિસ્ટ છે. તેઓ ભારતમાં ઉપલબ્ધ રેડિયોથેરાપી સારવારના સંશોધન અને જટિલ કેન્સરની સારવારમાં ૧૫ વર્ષથી વધુનો અનુભવ ધરાવે છે.",
+        "desc2": "ભારતની પ્રખ્યાત આચાર્ય હરિહર પ્રાદેશિક કેન્સર કેન્દ્ર (AHRCC), કટકથી તાલીમ મેળવેલ ડો. સાર્થક દર્દીઓ માટે ઉત્તમ સેવા પ્રદાન કરે છે."
+      }
+    }
+  }
+}
