@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import gsap from "gsap";
 import { ArrowRight, BadgeCheck, Clock, Hospital } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
+import Image from "next/image";
 
 export default function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -30,8 +31,7 @@ export default function HeroSection() {
       <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-brand-teal/10 rounded-full blur-[120px] pointer-events-none transform-gpu" />
       <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-brand-lavender/10 rounded-full blur-[100px] pointer-events-none transform-gpu" />
       
-      {/* Particle Overlay (Simple CSS placeholder for ThreeJS) */}
-      <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none z-10" />
+      
 
       <div className="container mx-auto px-6 md:px-12 relative z-20">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
@@ -39,9 +39,9 @@ export default function HeroSection() {
           {/* Left Content */}
           <motion.div style={{ y, opacity, willChange: "transform, opacity" }} className="max-w-2xl">
             <motion.div 
-              initial={{ opacity: 1, x: 0 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             >
 
 
@@ -98,19 +98,21 @@ export default function HeroSection() {
 
           {/* Right Content - Illustration / Interactive area */}
           <motion.div 
-            initial={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.2, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="relative h-[600px] w-full flex items-center justify-center"
           >
             {/* Doctor Portrait Image Frame */}
             <div className="absolute inset-0 flex items-center justify-center z-10">
               <div className="w-[400px] h-[500px] relative rounded-[60px] border border-slate-200/80 overflow-hidden shadow-2xl bg-slate-50 flex items-center justify-center group-hover:border-brand-teal/30 transition-colors duration-500">
-                <img 
+                <Image 
                   src="/dr-sarthak.jpg" 
                   alt="Dr. Sarthak Kumar Mohanty - Radiation Oncologist" 
                   className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-105"
-                  loading="eager"
+                  width={400}
+                  height={500}
+                  priority={true}
                 />
                 {/* Elegant overlay to blend slightly with the premium background */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#FAFAFA]/10 via-transparent to-transparent pointer-events-none" />

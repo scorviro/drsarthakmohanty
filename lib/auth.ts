@@ -1,4 +1,4 @@
-// Simple JWT/session utility to sign and verify authentic patient review sessions.
+import jwt from "jsonwebtoken";
 
 export interface UserSession {
   userId: string;
@@ -6,73 +6,41 @@ export interface UserSession {
   email: string;
   avatar: string;
   isAdmin: boolean;
-  iat: number;
+  iat?: number;
 }
 
-// In a real application, you would use jsonwebtoken library.
-// To keep deployment painless and zero-dependency, we implement a lightweight, secure JSON Base64 signature verification.
+const getSecret = (): string => {
+  const secret = process.env.SESSION_SECRET;
+  if (!secret) {
+    throw new Error("SESSION_SECRET is not configured in environment variables.");
+  }
+  return secret;
+};
+
+// Sign a session token using standard HS256 JWT
 export function signSession(user: Omit<UserSession, "iat">): string {
-  const payload: UserSession = {
-    ...user,
-    iat: Math.floor(Date.now() / 1000),
-  };
-  const stringified = JSON.stringify(payload);
-  
-  // Safe base64 encoding (Next.js Edge & Node compatible)
-  const base64 = typeof btoa !== "undefined" 
-    ? btoa(unescape(encodeURIComponent(stringified)))
-    : Buffer.from(stringified).toString("base64");
-    
-  // Simple signature to prevent client tampering
-  const signature = simpleHash(base64 + (process.env.SESSION_SECRET || "dr-sarthak-secure-key-2026"));
-  return `${base64}.${signature}`;
+  const secret = getSecret();
+  // Sign token with a 30-day expiration
+  return jwt.sign(user, secret, { expiresIn: "30d" });
 }
 
+// Verify a session token using standard HS256 JWT
 export function verifySession(token?: string): UserSession | null {
   if (!token) return null;
-  const parts = token.split(".");
-  if (parts.length !== 2) return null;
-  const [base64, signature] = parts;
-  
-  const expectedSignature = simpleHash(base64 + (process.env.SESSION_SECRET || "dr-sarthak-secure-key-2026"));
-  if (signature !== expectedSignature) {
-    return null; // Tampered token!
-  }
-
   try {
-    const stringified = typeof atob !== "undefined"
-      ? decodeURIComponent(escape(atob(base64)))
-      : Buffer.from(base64, "base64").toString("utf-8");
-    const session = JSON.parse(stringified) as UserSession;
-
-    // Check expiration (30 days)
-    const thirtyDaysSeconds = 60 * 60 * 24 * 30;
-    const nowSeconds = Math.floor(Date.now() / 1000);
-    if (session.iat && nowSeconds - session.iat > thirtyDaysSeconds) {
-      console.log("Session has expired:", session.email);
-      return null;
-    }
-
-    return session;
+    const secret = getSecret();
+    const decoded = jwt.verify(token, secret) as UserSession;
+    return decoded;
   } catch (error) {
+    console.error("JWT verification failed:", error);
     return null;
   }
 }
 
-// Simple deterministic hash to secure mock tokens without heavy crypto libraries
-function simpleHash(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return Math.abs(hash).toString(36);
-}
-
 // Check if an email is registered as an Admin
 export function isAdminEmail(email: string): boolean {
-  const adminEmailsStr = process.env.ADMIN_EMAILS || "doctor@hcg.com";
+  const adminEmailsStr = process.env.ADMIN_EMAILS;
+  if (!adminEmailsStr) return false;
   const admins = adminEmailsStr.split(",").map((e) => e.trim().toLowerCase());
-  return admins.includes(email.toLowerCase()) || email.toLowerCase() === "mohitchudasama11111@gmail.com";
+  return admins.includes(email.toLowerCase());
 }

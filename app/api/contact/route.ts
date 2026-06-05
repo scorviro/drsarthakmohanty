@@ -2,23 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getDbMessages, insertMessage, deleteMessageFromDb, markMessageReadInDb } from "@/lib/db";
 import { verifySession } from "@/lib/auth";
-
-// Rate limiting cache
-const ipCache = new Map<string, number[]>();
-
-function isRateLimited(ip: string, limit = 5, windowMs = 60 * 1000): boolean {
-  const now = Date.now();
-  const timestamps = ipCache.get(ip) || [];
-  const activeTimestamps = timestamps.filter((t) => now - t < windowMs);
-  
-  if (activeTimestamps.length >= limit) {
-    return true;
-  }
-  
-  activeTimestamps.push(now);
-  ipCache.set(ip, activeTimestamps);
-  return false;
-}
+import { isRateLimited } from "@/lib/ratelimit";
 
 // XSS Sanitizer Helper
 function sanitizeHtml(str: string): string {
@@ -51,7 +35,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Unauthorized admin access." }, { status: 401 });
     }
 
-    const messages = getDbMessages();
+    const messages = await getDbMessages();
     return NextResponse.json({ success: true, messages });
   } catch (error) {
     console.error("GET messages error:", error);
@@ -64,7 +48,7 @@ export async function POST(request: Request) {
   try {
     // 1. Rate Limiting Check
     const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "127.0.0.1";
-    if (isRateLimited(ip, 3, 60 * 1000)) {
+    if (await isRateLimited(ip, 3, 60 * 1000, "contact")) {
       return NextResponse.json({ error: "Too many requests. Please wait a minute before submitting again." }, { status: 429 });
     }
 
@@ -103,7 +87,7 @@ export async function POST(request: Request) {
     const sanitizedMessage = sanitizeHtml(message);
 
     // Save to Database
-    const newMessage = insertMessage({
+    const newMessage = await insertMessage({
       name: sanitizedName,
       email: sanitizedEmail,
       messageText: sanitizedMessage,
@@ -135,7 +119,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Message ID is required." }, { status: 400 });
     }
 
-    const updated = markMessageReadInDb(messageId);
+    const updated = await markMessageReadInDb(messageId);
     if (!updated) {
       return NextResponse.json({ error: "Message not found." }, { status: 404 });
     }
@@ -162,7 +146,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Message ID is required." }, { status: 400 });
     }
 
-    const success = deleteMessageFromDb(messageId);
+    const success = await deleteMessageFromDb(messageId);
     if (!success) {
       return NextResponse.json({ error: "Message not found or could not be deleted." }, { status: 404 });
     }

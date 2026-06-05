@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import NextImage from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ShieldAlert, 
@@ -735,10 +736,12 @@ export default function AdminPage() {
         <div className="space-y-8">
           {/* Doctor Profile Banner */}
           <div className="flex items-center space-x-4 border-b border-slate-800 pb-6">
-            <img 
+            <NextImage 
               src={user.avatar || "/dr-sarthak.png"} 
               alt={user.name} 
               className="w-12 h-12 rounded-full border-2 border-brand-teal object-cover object-top"
+              width={48}
+              height={48}
             />
             <div className="overflow-hidden">
               <h4 className="font-bold text-white text-sm truncate">{user.name}</h4>
@@ -1205,7 +1208,7 @@ export default function AdminPage() {
                   <div>
                     <div className="flex justify-between items-start gap-4 mb-4">
                       <div className="flex items-center space-x-3">
-                        <img src={r.avatar || "/dr-sarthak.png"} alt={r.name} className="w-10 h-10 rounded-full object-cover" />
+                        <NextImage src={r.avatar || "/dr-sarthak.png"} alt={r.name} className="w-10 h-10 rounded-full object-cover" width={40} height={40} />
                         <div>
                           <h4 className="font-bold text-slate-950 text-sm leading-none">{r.name}</h4>
                           <span className="text-[10px] text-slate-500">{r.email}</span>
@@ -1480,11 +1483,11 @@ export default function AdminPage() {
                 <div key={art.id} className="bg-white border border-slate-200 rounded-[32px] overflow-hidden shadow-sm flex flex-col justify-between">
                   <div className="relative h-44 bg-gradient-to-br from-brand-teal/15 to-slate-900 flex items-center justify-center overflow-hidden">
                     <ImageIcon className="text-brand-teal/20 absolute" size={36} />
-                    <img 
+                    <NextImage 
                       src={art.image} 
                       alt={art.title?.en} 
                       className="absolute inset-0 w-full h-full object-cover"
-                      onError={(e: any) => { e.target.style.opacity = "0"; }}
+                      fill
                     />
                     <span className="absolute top-4 left-4 bg-slate-900/80 backdrop-blur-md text-white text-[10px] uppercase tracking-wider font-extrabold px-3 py-1 rounded-full border border-white/10 z-10">
                       {art.category}
@@ -1745,10 +1748,11 @@ export default function AdminPage() {
               {photos.map((photo) => (
                 <div key={photo.filename} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow group">
                   <div className="relative h-40 bg-slate-100 flex items-center justify-center">
-                    <img 
+                    <NextImage 
                       src={photo.url} 
                       alt={photo.filename} 
                       className="w-full h-full object-cover"
+                      fill
                     />
                     <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
                       <button 

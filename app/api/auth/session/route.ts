@@ -34,7 +34,9 @@ export async function POST(request: Request) {
       }
       const cleanEmail = email.trim().toLowerCase();
       const cleanPassword = password.trim();
-      if (cleanEmail === "mohitchudasama11111@gmail.com" && cleanPassword === "Hkqz@835admin") {
+      const portalEmail = process.env.PORTAL_EMAIL;
+      const portalPassword = process.env.PORTAL_PASSWORD;
+      if (portalEmail && portalPassword && cleanEmail === portalEmail.trim().toLowerCase() && cleanPassword === portalPassword.trim()) {
         userProfile = {
           userId: "admin_mohitchudasama",
           name: "Dr. Sarthak Mohanty",

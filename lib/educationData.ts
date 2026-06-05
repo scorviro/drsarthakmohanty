@@ -50,7 +50,7 @@ export const educationArticles: Article[] = [
     slug: "managing-diabetes-naturally",
     category: "diabetes",
     readTime: 5,
-    image: "https://images.unsplash.com/photo-1530026405186-ed1ea0ac7a63?q=80&w=600&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1505576399279-565b52d4ac71?q=80&w=600&auto=format&fit=crop",
     trending: true,
     title: {
       en: "Understanding & Managing Blood Sugar Levels",

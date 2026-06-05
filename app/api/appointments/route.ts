@@ -2,23 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getDbAppointments, insertAppointment, updateAppointmentStatusInDb, deleteAppointmentFromDb } from "@/lib/db";
 import { verifySession } from "@/lib/auth";
-
-// Rate limiting cache
-const ipCache = new Map<string, number[]>();
-
-function isRateLimited(ip: string, limit = 5, windowMs = 60 * 1000): boolean {
-  const now = Date.now();
-  const timestamps = ipCache.get(ip) || [];
-  const activeTimestamps = timestamps.filter((t) => now - t < windowMs);
-  
-  if (activeTimestamps.length >= limit) {
-    return true;
-  }
-  
-  activeTimestamps.push(now);
-  ipCache.set(ip, activeTimestamps);
-  return false;
-}
+import { isRateLimited } from "@/lib/ratelimit";
 
 // XSS Sanitizer Helper
 function sanitizeHtml(str: string): string {
@@ -51,7 +35,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Unauthorized admin access." }, { status: 401 });
     }
 
-    const appointments = getDbAppointments();
+    const appointments = await getDbAppointments();
     return NextResponse.json({ success: true, appointments });
   } catch (error) {
     console.error("GET appointments error:", error);
@@ -64,7 +48,7 @@ export async function POST(request: Request) {
   try {
     // 1. Rate Limiting Check
     const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "127.0.0.1";
-    if (isRateLimited(ip, 3, 60 * 1000)) {
+    if (await isRateLimited(ip, 3, 60 * 1000, "appointments")) {
       return NextResponse.json({ error: "Too many requests. Please wait a minute before submitting again." }, { status: 429 });
     }
 
@@ -103,7 +87,7 @@ export async function POST(request: Request) {
     const sanitizedTimeSlot = timeSlot ? sanitizeHtml(timeSlot) : "";
 
     // Save to Database
-    const newAppointment = insertAppointment({
+    const newAppointment = await insertAppointment({
       name: sanitizedName,
       phone: sanitizedPhone,
       date,
@@ -141,7 +125,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Invalid status value." }, { status: 400 });
     }
 
-    const updated = updateAppointmentStatusInDb(appointmentId, status);
+    const updated = await updateAppointmentStatusInDb(appointmentId, status);
     if (!updated) {
       return NextResponse.json({ error: "Appointment not found." }, { status: 404 });
     }
@@ -168,7 +152,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Appointment ID is required." }, { status: 400 });
     }
 
-    const success = deleteAppointmentFromDb(appointmentId);
+    const success = await deleteAppointmentFromDb(appointmentId);
     if (!success) {
       return NextResponse.json({ error: "Appointment not found or could not be deleted." }, { status: 404 });
     }

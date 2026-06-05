@@ -3,23 +3,7 @@ import { cookies } from "next/headers";
 import { getDbReviews, upsertReview, Review } from "@/lib/db";
 import { verifySession } from "@/lib/auth";
 import { moderateReview } from "@/lib/moderation";
-
-// In-memory sliding window rate limiter cache
-const ipCache = new Map<string, number[]>();
-
-function isRateLimited(ip: string, limit = 5, windowMs = 60 * 1000): boolean {
-  const now = Date.now();
-  const timestamps = ipCache.get(ip) || [];
-  const activeTimestamps = timestamps.filter((t) => now - t < windowMs);
-  
-  if (activeTimestamps.length >= limit) {
-    return true;
-  }
-  
-  activeTimestamps.push(now);
-  ipCache.set(ip, activeTimestamps);
-  return false;
-}
+import { isRateLimited } from "@/lib/ratelimit";
 
 // XSS Sanitizer Helper
 function sanitizeHtml(str: string): string {
@@ -46,7 +30,7 @@ export async function GET(request: Request) {
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "6", 10);
 
-    let reviews = getDbReviews();
+    let reviews = await getDbReviews();
 
     // Session validation if in admin mode
     if (isAdminMode) {
@@ -92,7 +76,7 @@ export async function POST(request: Request) {
   try {
     // 1. Rate Limiting Check
     const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "127.0.0.1";
-    if (isRateLimited(ip, 5, 60 * 1000)) {
+    if (await isRateLimited(ip, 5, 60 * 1000, "reviews")) {
       return NextResponse.json({ error: "Too many review submissions. Please wait a minute and try again." }, { status: 429 });
     }
 
@@ -156,7 +140,7 @@ export async function POST(request: Request) {
     const initialStatus = isClean ? "approved" : "pending";
 
     // 7. Upsert review
-    const newReview = upsertReview({
+    const newReview = await upsertReview({
       userId: session.userId,
       name: session.name,
       email: session.email,

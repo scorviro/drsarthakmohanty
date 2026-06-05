@@ -15,7 +15,7 @@ function getAdminSession() {
 // GET: Fetch current system settings (Public)
 export async function GET(request: Request) {
   try {
-    const settings = getDbSettings();
+    const settings = await getDbSettings();
     return NextResponse.json({ success: true, settings });
   } catch (error) {
     console.error("GET settings error:", error);
@@ -35,7 +35,7 @@ export async function PUT(request: Request) {
     const { isBookingEnabled, contactPhone, clinicTimings, showReviews } = body;
 
     // Build sanitization / validation
-    const currentSettings = getDbSettings();
+    const currentSettings = await getDbSettings();
     const updatedSettings = {
       isBookingEnabled: typeof isBookingEnabled === "boolean" ? isBookingEnabled : currentSettings.isBookingEnabled,
       contactPhone: contactPhone ? String(contactPhone).trim() : currentSettings.contactPhone,
@@ -43,7 +43,7 @@ export async function PUT(request: Request) {
       showReviews: typeof showReviews === "boolean" ? showReviews : currentSettings.showReviews,
     };
 
-    const success = saveDbSettings(updatedSettings);
+    const success = await saveDbSettings(updatedSettings);
     if (!success) {
       return NextResponse.json({ error: "Failed to write settings to database." }, { status: 500 });
     }

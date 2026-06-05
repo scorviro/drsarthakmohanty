@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { Star, X, HeartPulse, Plus, Shield, LogOut, CheckCircle2, ChevronLeft, ChevronRight, Lock } from "lucide-react";
 import GoogleAuthModal from "./GoogleAuthModal";
@@ -415,10 +416,12 @@ export default function Statistics() {
         <div className="flex justify-end items-center mb-8 space-x-3">
           {isAuthenticated ? (
             <div className="flex items-center space-x-3 bg-white border border-slate-200 rounded-full px-4 py-2 shadow-sm">
-              <img
+              <Image
                 src={currentUser?.avatar}
                 alt={currentUser?.name}
                 className="w-7 h-7 rounded-full border border-slate-100 shadow-sm"
+                width={28}
+                height={28}
               />
               <span className="text-xs font-semibold text-slate-800">{currentUser?.name}</span>
               
@@ -519,10 +522,12 @@ export default function Statistics() {
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-3">
-                        <img
+                        <Image
                           src={review.avatar}
                           alt={review.name}
                           className="w-10 h-10 rounded-full border border-slate-200 shadow-sm"
+                          width={40}
+                          height={40}
                         />
                         <div>
                           <h4 className="text-slate-900 font-bold text-base leading-tight flex items-center space-x-1">
@@ -628,10 +633,12 @@ export default function Statistics() {
               </button>
 
               <div className="flex items-center space-x-3 mb-6 pb-4 border-b border-slate-100">
-                <img
+                <Image
                   src={currentUser?.avatar}
                   alt={currentUser?.name}
                   className="w-11 h-11 rounded-full border border-slate-200 shadow-sm"
+                  width={44}
+                  height={44}
                 />
                 <div>
                   <h3 className="font-bold text-lg text-slate-900 leading-tight flex items-center space-x-1.5">

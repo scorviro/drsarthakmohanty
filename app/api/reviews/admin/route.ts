@@ -22,7 +22,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Unauthorized admin access." }, { status: 401 });
     }
 
-    const reviews = getDbReviews();
+    const reviews = await getDbReviews();
     
     // Sort: pinned first, then by date descending
     reviews.sort((a, b) => {
@@ -52,7 +52,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Invalid review ID or status." }, { status: 400 });
     }
 
-    const updated = updateReviewStatusInDb(reviewId, status);
+    const updated = await updateReviewStatusInDb(reviewId, status);
     if (!updated) {
       return NextResponse.json({ error: "Review not found." }, { status: 404 });
     }
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
     const { reviewId, action } = body;
 
     if (action === "pin") {
-      const updated = togglePinInDb(reviewId);
+      const updated = await togglePinInDb(reviewId);
       if (!updated) {
         return NextResponse.json({ error: "Review not found." }, { status: 404 });
       }
@@ -103,7 +103,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Review ID required." }, { status: 400 });
     }
 
-    const success = deleteReviewFromDb(reviewId);
+    const success = await deleteReviewFromDb(reviewId);
     if (!success) {
       return NextResponse.json({ error: "Review not found or could not be deleted." }, { status: 404 });
     }

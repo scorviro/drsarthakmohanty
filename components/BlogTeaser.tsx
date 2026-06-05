@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { educationArticles, categories, Article } from "@/lib/educationData";
+import Image from "next/image";
 
 // Category Icons mapping
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -200,13 +201,11 @@ export default function BlogTeaser() {
             >
               <div className="h-56 overflow-hidden relative bg-gradient-to-br from-brand-teal/15 to-slate-900 flex items-center justify-center">
                 <Stethoscope className="text-brand-teal/20 absolute" size={40} />
-                <img 
+                <Image 
                   src={article.image}
                   alt={article.title[language]}
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  onError={(e: any) => {
-                    e.target.style.opacity = "0";
-                  }}
+                  fill
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent pointer-events-none" />
                 <span className="absolute top-4 left-4 glass-panel px-4 py-1.5 rounded-full text-xs font-semibold text-slate-900 border border-slate-300 bg-white/95 z-10">
@@ -427,13 +426,11 @@ export default function BlogTeaser() {
                         {/* Article Header Image */}
                         <div className="w-full h-64 md:h-80 rounded-[24px] overflow-hidden relative bg-gradient-to-br from-brand-teal/15 to-slate-900 flex items-center justify-center mb-8 shadow-md">
                           <Stethoscope className="text-brand-teal/20 absolute" size={60} />
-                          <img 
+                          <Image 
                             src={activeArticle.image}
                             alt={activeArticle.title[language]}
                             className="absolute inset-0 w-full h-full object-cover"
-                            onError={(e: any) => {
-                              e.target.style.opacity = "0";
-                            }}
+                            fill
                           />
                         </div>
 

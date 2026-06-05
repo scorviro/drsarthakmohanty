@@ -38,6 +38,7 @@ reviews.json
 messages.json
 appointments.json
 settings.json
+local.db*
 
 
 

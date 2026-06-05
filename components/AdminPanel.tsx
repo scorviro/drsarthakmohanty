@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { X, Check, Star, Trash2, Pin, ShieldCheck, Filter, Mail, MessageSquare } from "lucide-react";
 import { Review, ContactMessage } from "@/lib/db";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 interface AdminPanelProps {
   isOpen: boolean;
@@ -293,10 +294,12 @@ export default function AdminPanel({ isOpen, onClose, onReviewsUpdated, showToas
 
                   <div className="flex items-start justify-between mb-3 pt-1">
                     <div className="flex items-center space-x-3">
-                      <img
+                      <Image
                         src={review.avatar}
                         alt={review.name}
                         className="w-10 h-10 rounded-full border border-slate-200 shadow-sm"
+                        width={40}
+                        height={40}
                       />
                       <div>
                         <h4 className="text-sm font-bold text-slate-900 flex items-center space-x-1.5">
