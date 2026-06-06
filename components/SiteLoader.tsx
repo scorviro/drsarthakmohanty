@@ -6,19 +6,27 @@ export default function SiteLoader() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Prevent scrolling while loading
     document.body.style.overflow = "hidden";
-    
-    // Hide loader after 3.5 seconds
-    const timer = setTimeout(() => {
+
+    const handleLoad = () => {
       setIsLoading(false);
       document.body.style.overflow = "auto";
-    }, 3500);
-
-    return () => {
-      clearTimeout(timer);
-      document.body.style.overflow = "auto";
     };
+
+    if (document.readyState === "complete") {
+      // Short grace period for animations to initialize if already loaded
+      const timer = setTimeout(handleLoad, 800);
+      return () => clearTimeout(timer);
+    } else {
+      window.addEventListener("load", handleLoad, { once: true });
+      // Hard cap at 2s in case resources stall
+      const cap = setTimeout(handleLoad, 2000);
+      return () => {
+        window.removeEventListener("load", handleLoad);
+        clearTimeout(cap);
+        document.body.style.overflow = "auto";
+      };
+    }
   }, []);
 
   return (

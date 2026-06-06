@@ -72,7 +72,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="light">
+    <html lang="en" className="light" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://maps.googleapis.com" />
+        <link rel="preconnect" href="https://maps.gstatic.com" crossOrigin="" />
+      </head>
       <body className="font-serif bg-[#FAFAFA] text-slate-900 antialiased">
         <script
           type="application/ld+json"

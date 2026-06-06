@@ -63,7 +63,7 @@ export default function AboutSection() {
             <div className="relative w-full h-[600px] glass-panel-strong rounded-3xl border border-slate-200 overflow-hidden shadow-2xl group">
               {/* Parallax doctor portrait image */}
               <motion.img
-                src="/dr-sarthak.png"
+                src="/dr-sarthak.jpg"
                 alt="Dr. Sarthak Kumar Mohanty"
                 style={{ y: yVal }}
                 className="absolute inset-0 w-full h-[115%] object-cover object-top filter contrast-[1.03] brightness-[1.01] transition-transform duration-700 ease-out group-hover:scale-105"

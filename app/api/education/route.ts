@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
-import { educationArticles as staticArticles } from "@/lib/educationData";
+import { getDbArticles as loadArticles } from "@/lib/db";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const ARTICLES_FILE = path.join(DATA_DIR, "educationArticles.json");
@@ -11,18 +11,6 @@ async function ensureDataDir() {
     await fs.mkdir(DATA_DIR, { recursive: true });
   } catch (err) {
     // Ignore
-  }
-}
-
-async function loadArticles() {
-  await ensureDataDir();
-  try {
-    const data = await fs.readFile(ARTICLES_FILE, "utf-8");
-    return JSON.parse(data);
-  } catch (e) {
-    // Fallback to static articles and write them
-    await fs.writeFile(ARTICLES_FILE, JSON.stringify(staticArticles, null, 2), "utf-8");
-    return staticArticles;
   }
 }
 

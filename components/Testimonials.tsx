@@ -4,9 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Quote, Star, CheckCircle } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 
-export default function Testimonials() {
+export default function Testimonials({ initialReviews = [] }: { initialReviews?: any[] }) {
   const { t } = useLanguage();
-  const [dynamicReviews, setDynamicReviews] = useState<any[]>([]);
+  const [dynamicReviews, setDynamicReviews] = useState<any[]>(initialReviews);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const defaultTestimonials = [
@@ -34,8 +34,10 @@ export default function Testimonials() {
   ];
 
   useEffect(() => {
-    fetchFeaturedReviews();
-  }, []);
+    if (initialReviews.length === 0) {
+      fetchFeaturedReviews();
+    }
+  }, [initialReviews]);
 
   const fetchFeaturedReviews = async () => {
     try {

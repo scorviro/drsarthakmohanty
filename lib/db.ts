@@ -2,6 +2,9 @@ import { drizzle } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
 import { eq, desc } from "drizzle-orm";
 import * as schema from "./schema";
+import fs from "fs/promises";
+import path from "path";
+import { educationArticles as staticArticles } from "./educationData";
 
 const client = createClient({
   url: process.env.TURSO_DATABASE_URL || "file:local.db",
@@ -323,5 +326,23 @@ export async function saveDbSettings(settingsData: SystemSettings): Promise<bool
   } catch (error) {
     console.error("Error writing settings:", error);
     return false;
+  }
+}
+
+const ARTICLES_FILE = path.join(process.cwd(), "data", "educationArticles.json");
+
+export async function getDbArticles(): Promise<any[]> {
+  try {
+    const data = await fs.readFile(ARTICLES_FILE, "utf-8");
+    return JSON.parse(data);
+  } catch (e) {
+    // Fallback to static articles and write them if file does not exist
+    try {
+      await fs.mkdir(path.join(process.cwd(), "data"), { recursive: true });
+      await fs.writeFile(ARTICLES_FILE, JSON.stringify(staticArticles, null, 2), "utf-8");
+    } catch (err) {
+      console.error("Failed to write static articles:", err);
+    }
+    return staticArticles;
   }
 }

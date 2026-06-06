@@ -15,23 +15,31 @@ function Counter({ target, suffix, title }: { target: number, suffix: string, ti
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    if (isInView) {
-      let start = 0;
-      const duration = 2000;
-      const increment = target / (duration / 16);
-      
-      const timer = setInterval(() => {
-        start += increment;
-        if (start >= target) {
-          setCount(target);
-          clearInterval(timer);
-        } else {
-          setCount(Math.ceil(start));
-        }
-      }, 16);
-      
-      return () => clearInterval(timer);
-    }
+    if (!isInView) return;
+    const duration = 2000;
+    const startTime = performance.now();
+
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const currentVal = eased * target;
+
+      if (target % 1 === 0) {
+        setCount(Math.ceil(currentVal));
+      } else {
+        setCount(Number(currentVal.toFixed(1)));
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setCount(target);
+      }
+    };
+
+    requestAnimationFrame(animate);
   }, [isInView, target]);
 
   return (
@@ -99,43 +107,47 @@ const InteractiveStars = ({ value, onChange }: { value: number; onChange: (val: 
 // Confetti Effect component for success submissions
 const Confetti = () => {
   const colors = ["#00BFA5", "#D4A843", "#8B9FF4", "#10B981", "#3B82F6"];
+  
+  // Stable, server-safe generation using a simple mathematical sequence (no Math.random on render)
+  const items = Array.from({ length: 24 }, (_, i) => {
+    const size = ((i * 7) % 8) + 6; // pseudo-random stable size
+    const delay = ((i * 3) % 10) * 0.05; // pseudo-random stable delay
+    const x = ((i * 17) % 100); // pseudo-random stable X position
+    const color = colors[i % colors.length];
+    return { id: i, size, delay, x, color };
+  });
+
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-[60]">
-      {Array.from({ length: 35 }).map((_, i) => {
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        const size = Math.random() * 8 + 6;
-        const delay = Math.random() * 0.4;
-        return (
-          <motion.div
-            key={i}
-            initial={{ 
-              x: "50%", 
-              y: "50%", 
-              scale: 0.1, 
-              opacity: 1,
-              rotate: 0 
-            }}
-            animate={{ 
-              x: `${Math.random() * 100}%`, 
-              y: `${Math.random() * 80 + 10}%`,
-              scale: Math.random() * 1.2 + 0.4,
-              opacity: [1, 1, 0],
-              rotate: Math.random() * 360 + 180
-            }}
-            transition={{ 
-              duration: 2.0, 
-              ease: "easeOut",
-              delay 
-            }}
-            className="absolute rounded-full"
-            style={{ 
-              backgroundColor: color, 
-              width: size, 
-              height: size 
-            }}
-          />
-        );
-      })}
+      <style>{`
+        @keyframes confetti-fall {
+          0% {
+            transform: translateY(-20px) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+          }
+        }
+        .animate-confetti {
+          animation: confetti-fall 2.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+      `}</style>
+      {items.map(item => (
+        <div
+          key={item.id}
+          className="absolute rounded-full animate-confetti"
+          style={{
+            left: `${item.x}%`,
+            top: "-20px",
+            width: item.size,
+            height: item.size,
+            backgroundColor: item.color,
+            animationDelay: `${item.delay}s`,
+          }}
+        />
+      ))}
     </div>
   );
 };
@@ -167,7 +179,13 @@ const SkeletonReview = () => (
   </div>
 );
 
-export default function Statistics() {
+export default function Statistics({ 
+  initialReviews = [], 
+  initialTotalReviews = 0 
+}: { 
+  initialReviews?: any[], 
+  initialTotalReviews?: number 
+}) {
   const { t } = useLanguage();
 
   // Auth & Session States
@@ -178,10 +196,10 @@ export default function Statistics() {
   const [detectedNgrokUrl, setDetectedNgrokUrl] = useState("");
 
   // Review list states
-  const [reviews, setReviews] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState<any[]>(initialReviews);
+  const [loading, setLoading] = useState(initialReviews.length === 0);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalPages, setTotalPages] = useState(Math.ceil(initialTotalReviews / 6) || 1);
   
   // Modals & Form states
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -273,8 +291,16 @@ export default function Statistics() {
     }
   };
 
+  const isFirstRender = useRef(true);
+
   // 2. Fetch reviews when page change
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      if (initialReviews.length > 0) {
+        return;
+      }
+    }
     fetchReviews();
   }, [page]);
 

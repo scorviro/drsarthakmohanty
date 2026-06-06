@@ -13,8 +13,8 @@ div[id] {
 }
 
 :root {
-  --background: #070B14;
-  --foreground: #FFFFFF;
+  --background: #FAFAFA;
+  --foreground: #0F172A;
 }
 
 body {
@@ -39,11 +39,11 @@ body::-webkit-scrollbar {
 }
 
 body::-webkit-scrollbar-track {
-  background: #070B14;
+  background: #FAFAFA;
 }
 
 body::-webkit-scrollbar-thumb {
-  background: #111827;
+  background: #CBD5E1;
   border-radius: 4px;
 }
 

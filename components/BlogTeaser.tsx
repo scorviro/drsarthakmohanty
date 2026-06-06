@@ -34,13 +34,13 @@ const categoryIcons: Record<string, React.ReactNode> = {
   preventive: <Stethoscope className="w-6 h-6 text-[#0D9488]" />,
 };
 
-export default function BlogTeaser() {
+export default function BlogTeaser({ initialArticles = [] }: { initialArticles?: Article[] }) {
   const { t, language } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeArticle, setActiveArticle] = useState<Article | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [articles, setArticles] = useState<Article[]>(educationArticles);
+  const [articles, setArticles] = useState<Article[]>(initialArticles.length > 0 ? initialArticles : educationArticles);
   
   // States stored in localStorage
   const [bookmarks, setBookmarks] = useState<string[]>([]);
@@ -65,16 +65,18 @@ export default function BlogTeaser() {
       console.error("Failed to load local storage data:", e);
     }
 
-    // Fetch dynamic articles
-    fetch("/api/education")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.articles) {
-          setArticles(data.articles);
-        }
-      })
-      .catch((err) => console.error("Failed to fetch dynamic articles:", err));
-  }, []);
+    if (initialArticles.length === 0) {
+      // Fetch dynamic articles
+      fetch("/api/education")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.articles) {
+            setArticles(data.articles);
+          }
+        })
+        .catch((err) => console.error("Failed to fetch dynamic articles:", err));
+    }
+  }, [initialArticles]);
 
   // Handle Bookmarks
   const toggleBookmark = (id: string, e: React.MouseEvent) => {

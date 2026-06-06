@@ -8,11 +8,12 @@ export default function SmoothScrolling({ children }: { children: React.ReactNod
     gsap.registerPlugin(ScrollTrigger);
 
     const lenis = new Lenis({
-      lerp: 0.05, // Deeper, more luxurious easing for fluid scroll
-      duration: 1.5, // Extended duration for premium cinematic transitions
+      lerp: 0.12, // More responsive yet smooth easing
+      duration: 1.2, // Snappier duration
       smoothWheel: true,
       wheelMultiplier: 1,
       touchMultiplier: 1.5,
+      syncTouch: true,
     });
 
     (window as any).lenis = lenis;
@@ -23,7 +24,7 @@ export default function SmoothScrolling({ children }: { children: React.ReactNod
       lenis.raf(time * 1000);
     });
 
-    gsap.ticker.lagSmoothing(0);
+    gsap.ticker.lagSmoothing(300, 16);
 
     return () => {
       lenis.destroy();
