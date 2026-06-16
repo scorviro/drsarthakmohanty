@@ -73,7 +73,7 @@ export default function Navbar() {
       <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex flex-col">
-          <span className="display-font text-2xl font-bold tracking-tight text-white">
+          <span className="display-font text-xl font-bold tracking-tight text-white">
             Dr. Sarthak Kumar Mohanty
           </span>
           <span className="text-xs text-white tracking-widest uppercase">
