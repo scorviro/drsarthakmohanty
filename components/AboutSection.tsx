@@ -67,7 +67,7 @@ export default function AboutSection() {
           <div className="space-y-6">
             <div className="flex items-center space-x-4">
               <div className="w-16 h-16 rounded-full border-2 border-brand-teal overflow-hidden">
-                <img src="/dr-sarthak.jpg" alt="Dr. Sarthak" className="w-full h-full object-cover object-top" />
+                <img src="/dr-sarthak-about.jpg" alt="Dr. Sarthak" className="w-full h-full object-cover object-top" />
               </div>
               <div>
                 <h3 className="font-serif font-bold text-slate-900 text-xl">Dr. Sarthak Kumar Mohanty</h3>
@@ -382,7 +382,7 @@ export default function AboutSection() {
             <div className="relative w-full h-[600px] glass-panel-strong rounded-3xl border border-slate-200 overflow-hidden shadow-2xl group">
               {/* Parallax doctor portrait image */}
               <motion.img
-                src="/dr-sarthak.jpg"
+                src="/dr-sarthak-about.jpg"
                 alt="Dr. Sarthak Kumar Mohanty"
                 style={{ y: yVal }}
                 className="absolute inset-0 w-full h-[115%] object-cover object-top filter contrast-[1.03] brightness-[1.01] transition-transform duration-700 ease-out group-hover:scale-105"
@@ -515,7 +515,7 @@ export default function AboutSection() {
 
                       <div className="w-24 h-24 rounded-full border-4 border-amber-400/40 overflow-hidden shadow-xl">
                         <img 
-                          src="/dr-sarthak.jpg" 
+                          src="/dr-sarthak-about.jpg" 
                           alt="Dr. Sarthak"
                           className="w-full h-full object-cover object-top"
                         />

@@ -107,7 +107,7 @@ export default function HeroSection() {
             <div className="absolute inset-0 flex items-center justify-center z-10">
               <div className="w-[400px] h-[500px] relative rounded-[60px] border border-slate-200/80 overflow-hidden shadow-2xl bg-slate-50 flex items-center justify-center group-hover:border-brand-teal/30 transition-colors duration-500">
                 <Image 
-                  src="/dr-sarthak_1.jpg" 
+                  src="/dr-sarthak-hero.jpg" 
                   alt="Dr. Sarthak Kumar Mohanty - Radiation Oncologist" 
                   className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-105"
                   width={400}
