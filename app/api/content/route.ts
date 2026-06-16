@@ -4,6 +4,9 @@ import { verifySession } from "@/lib/auth";
 import { getDbValue, setDbValue } from "@/lib/db";
 import staticContent from "@/data/websiteContent.json";
 
+export const dynamic = "force-dynamic";
+
+
 export async function GET() {
   try {
     const content = await getDbValue("website_content", staticContent);

@@ -85,18 +85,16 @@ export default function BlogTeaser({ initialArticles = [] }: { initialArticles?:
       console.error("Failed to load local storage data:", e);
     }
 
-    if (initialArticles.length === 0) {
-      // Fetch dynamic articles
-      fetch("/api/education")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.articles) {
-            setArticles(data.articles);
-          }
-        })
-        .catch((err) => console.error("Failed to fetch dynamic articles:", err));
-    }
-  }, [initialArticles]);
+    // Always fetch latest dynamic articles in the background on mount
+    fetch("/api/education")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.articles) {
+          setArticles(data.articles);
+        }
+      })
+      .catch((err) => console.error("Failed to fetch dynamic articles:", err));
+  }, []);
 
   // Handle Bookmarks
   const toggleBookmark = (id: string, e: React.MouseEvent) => {

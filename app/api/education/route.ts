@@ -3,6 +3,9 @@ import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import { getDbArticles as loadArticles, saveDbArticles as saveArticles } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
+
 function isValidImageUrl(url: string): boolean {
   if (!url) return true;
   if (url.startsWith("/") || url.startsWith("./")) {
