@@ -64,4 +64,7 @@ export const patients = sqliteTable("patients", {
   createdAt: text("createdAt").notNull(),
   updatedAt: text("updatedAt").notNull(),
 });
-
+export const keyValueStore = sqliteTable("key_value_store", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+});

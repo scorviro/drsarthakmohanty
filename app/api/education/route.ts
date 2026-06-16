@@ -1,27 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
-import fs from "fs/promises";
-import path from "path";
-import { getDbArticles as loadArticles } from "@/lib/db";
-
-export const dynamic = "force-dynamic";
-
-const DATA_DIR = process.env.VERCEL ? "/tmp" : path.join(process.cwd(), "data");
-const ARTICLES_FILE = path.join(DATA_DIR, "educationArticles.json");
-
-async function ensureDataDir() {
-  try {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-  } catch (err) {
-    // Ignore
-  }
-}
-
-async function saveArticles(articles: any[]) {
-  await ensureDataDir();
-  await fs.writeFile(ARTICLES_FILE, JSON.stringify(articles, null, 2), "utf-8");
-}
+import { getDbArticles as loadArticles, saveDbArticles as saveArticles } from "@/lib/db";
 
 function isValidImageUrl(url: string): boolean {
   if (!url) return true;

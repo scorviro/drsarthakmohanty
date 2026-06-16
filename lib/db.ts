@@ -329,23 +329,42 @@ export async function saveDbSettings(settingsData: SystemSettings): Promise<bool
     return false;
   }
 }
-
-const ARTICLES_FILE = process.env.VERCEL 
-  ? path.join("/tmp", "educationArticles.json") 
-  : path.join(process.cwd(), "data", "educationArticles.json");
-
-export async function getDbArticles(): Promise<any[]> {
+export async function getDbValue(key: string, defaultValue: any): Promise<any> {
   try {
-    const data = await fs.readFile(ARTICLES_FILE, "utf-8");
-    return JSON.parse(data);
-  } catch (e) {
-    // Fallback to static articles and write them if file does not exist
-    try {
-      await fs.mkdir(path.join(process.cwd(), "data"), { recursive: true });
-      await fs.writeFile(ARTICLES_FILE, JSON.stringify(staticArticles, null, 2), "utf-8");
-    } catch (err) {
-      console.error("Failed to write static articles:", err);
+    const results = await db.select().from(schema.keyValueStore).where(eq(schema.keyValueStore.key, key));
+    if (results.length === 0) {
+      // Seed the database with the default value
+      await db.insert(schema.keyValueStore).values({ key, value: JSON.stringify(defaultValue) });
+      return defaultValue;
     }
-    return staticArticles;
+    return JSON.parse(results[0].value);
+  } catch (error) {
+    console.error(`Error reading key ${key} from database, falling back to default:`, error);
+    return defaultValue;
   }
 }
+
+export async function setDbValue(key: string, value: any): Promise<boolean> {
+  try {
+    const stringified = JSON.stringify(value);
+    const results = await db.select().from(schema.keyValueStore).where(eq(schema.keyValueStore.key, key));
+    if (results.length === 0) {
+      await db.insert(schema.keyValueStore).values({ key, value: stringified });
+    } else {
+      await db.update(schema.keyValueStore).set({ value: stringified }).where(eq(schema.keyValueStore.key, key));
+    }
+    return true;
+  } catch (error) {
+    console.error(`Error writing key ${key} to database:`, error);
+    return false;
+  }
+}
+
+export async function getDbArticles(): Promise<any[]> {
+  return getDbValue("education_articles", staticArticles);
+}
+
+export async function saveDbArticles(articles: any[]): Promise<boolean> {
+  return setDbValue("education_articles", articles);
+}
+
