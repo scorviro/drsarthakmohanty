@@ -27,30 +27,30 @@ async function migrateLegacyJson() {
   try {
     const fileData = await fs.readFile(PATIENTS_FILE, "utf-8");
     const legacyPatients = JSON.parse(fileData);
-    
+
     if (Array.isArray(legacyPatients) && legacyPatients.length > 0) {
       for (const lp of legacyPatients) {
         const pId = lp.patientId || `PAT-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
         const name = lp.name || "";
         const age = lp.age ? Number(lp.age) : null;
         const gender = lp.gender || null;
-        
+
         // Handle date fields fallback
         const visitDate = lp.visitDate || lp.dateOfVisit || new Date().toISOString().slice(0, 10);
-        
+
         // Handle diagnosis fields fallback
         const diagnosisCategory = lp.diagnosisCategory || lp.diseaseType || "General";
         const diagnosis = lp.diagnosis || lp.diseaseType || "General";
-        
+
         // Handle payment method fallback
         const paymentType = lp.paymentType || lp.paymentMethod || "Cash";
-        
+
         // Handle referring doctor fallback
         const referringDoctor = lp.referringDoctor || lp.referredBy || null;
-        
+
         // Handle contact phone fallback
         const contact = lp.contact || lp.phone || null;
-        
+
         const flags = JSON.stringify(lp.flags || []);
         const notes = lp.notes || lp.doctorNotes || null;
         const month = lp.month || null;
@@ -58,13 +58,13 @@ async function migrateLegacyJson() {
 
         // Gather all other customized clinical fields to save in extraData
         const knownKeys = [
-          "patientId", "name", "age", "gender", "visitDate", "dateOfVisit", 
-          "diagnosisCategory", "diagnosis", "diseaseType", "paymentType", 
-          "paymentMethod", "referringDoctor", "referredBy", "contact", 
-          "phone", "flags", "notes", "doctorNotes", "month", "year", 
+          "patientId", "name", "age", "gender", "visitDate", "dateOfVisit",
+          "diagnosisCategory", "diagnosis", "diseaseType", "paymentType",
+          "paymentMethod", "referringDoctor", "referredBy", "contact",
+          "phone", "flags", "notes", "doctorNotes", "month", "year",
           "createdAt", "updatedAt"
         ];
-        
+
         const extra: Record<string, any> = {};
         for (const key of Object.keys(lp)) {
           if (!knownKeys.includes(key)) {
@@ -117,18 +117,18 @@ export async function GET() {
 
     // Load patients from DB
     const list = await db.select().from(schema.patients);
-    
+
     // Format database patients to flat structure matching previous JSON structure
     const formatted = list.map((p) => {
       let extra: Record<string, any> = {};
       try {
         if (p.extraData) extra = JSON.parse(p.extraData);
-      } catch (e) {}
+      } catch (e) { }
 
       let parsedFlags: string[] = [];
       try {
         if (p.flags) parsedFlags = JSON.parse(p.flags);
-      } catch (e) {}
+      } catch (e) { }
 
       return {
         ...p,
@@ -154,9 +154,16 @@ export async function POST(request: Request) {
 
     const body = await request.json();
 
-    // Generate unique patient ID
-    const patientId = `PAT-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
-    
+    let patientId = body.patientId?.trim();
+    if (!patientId) {
+      patientId = `PAT-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
+    } else {
+      const exists = await db.select().from(schema.patients).where(eq(schema.patients.patientId, patientId));
+      if (exists.length > 0) {
+        return NextResponse.json({ error: "Patient ID already exists." }, { status: 400 });
+      }
+    }
+
     const name = body.name || "";
     const age = body.age ? Number(body.age) : null;
     const gender = body.gender || null;
@@ -173,11 +180,11 @@ export async function POST(request: Request) {
 
     // Any other parameters are customization EHR fields saved in extraData
     const knownKeys = [
-      "patientId", "name", "age", "gender", "visitDate", "diagnosisCategory", 
-      "diagnosis", "paymentType", "referringDoctor", "contact", "flags", 
+      "patientId", "name", "age", "gender", "visitDate", "diagnosisCategory",
+      "diagnosis", "paymentType", "referringDoctor", "contact", "flags",
       "notes", "month", "year"
     ];
-    
+
     const extra: Record<string, any> = {};
     for (const key of Object.keys(body)) {
       if (!knownKeys.includes(key)) {
@@ -207,9 +214,9 @@ export async function POST(request: Request) {
 
     await db.insert(schema.patients).values(dbPayload);
 
-    return NextResponse.json({ 
-      success: true, 
-      patient: { ...dbPayload, flags: body.flags || [], ...extra } 
+    return NextResponse.json({
+      success: true,
+      patient: { ...dbPayload, flags: body.flags || [], ...extra }
     });
   } catch (error) {
     logError("POST patient error", error);
@@ -226,14 +233,24 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { patientId } = body;
-    if (!patientId) {
+    const { patientId, oldPatientId } = body;
+    const lookupId = oldPatientId || patientId;
+    if (!lookupId) {
       return NextResponse.json({ error: "Patient ID is required for update." }, { status: 400 });
     }
 
-    const exists = await db.select().from(schema.patients).where(eq(schema.patients.patientId, patientId));
+    const exists = await db.select().from(schema.patients).where(eq(schema.patients.patientId, lookupId));
     if (exists.length === 0) {
       return NextResponse.json({ error: "Patient record not found in DB." }, { status: 404 });
+    }
+
+    // If patientId is being changed, check if new patientId is already taken by another patient
+    const newId = patientId?.trim();
+    if (newId && newId !== lookupId) {
+      const duplicate = await db.select().from(schema.patients).where(eq(schema.patients.patientId, newId));
+      if (duplicate.length > 0) {
+        return NextResponse.json({ error: "New Patient ID already exists." }, { status: 400 });
+      }
     }
 
     const name = body.name !== undefined ? body.name : exists[0].name;
@@ -252,8 +269,8 @@ export async function PUT(request: Request) {
 
     // Custom fields in extraData
     const knownKeys = [
-      "patientId", "name", "age", "gender", "visitDate", "diagnosisCategory", 
-      "diagnosis", "paymentType", "referringDoctor", "contact", "flags", 
+      "patientId", "name", "age", "gender", "visitDate", "diagnosisCategory",
+      "diagnosis", "paymentType", "referringDoctor", "contact", "flags",
       "notes", "month", "year", "createdAt", "updatedAt"
     ];
 
@@ -265,6 +282,7 @@ export async function PUT(request: Request) {
     }
 
     const updatedData = {
+      patientId: newId || lookupId,
       name,
       age,
       gender,
@@ -285,11 +303,11 @@ export async function PUT(request: Request) {
     await db
       .update(schema.patients)
       .set(updatedData)
-      .where(eq(schema.patients.patientId, patientId));
+      .where(eq(schema.patients.patientId, lookupId));
 
-    return NextResponse.json({ 
-      success: true, 
-      patient: { ...updatedData, patientId, flags: body.flags || [], ...extra } 
+    return NextResponse.json({
+      success: true,
+      patient: { ...updatedData, patientId, flags: body.flags || [], ...extra }
     });
   } catch (error) {
     logError("PUT patient error", error);
@@ -312,7 +330,7 @@ export async function DELETE(request: Request) {
     }
 
     await db.delete(schema.patients).where(eq(schema.patients.patientId, patientId));
-    
+
     return NextResponse.json({ success: true, message: "Patient record deleted successfully from DB." });
   } catch (error) {
     logError("DELETE patient error", error);

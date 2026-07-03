@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Plus, Edit, Trash2, X, Download, FileSpreadsheet, Settings, 
-  CheckSquare, Square, ChevronDown, UserCheck, Users, Banknote, 
-  ShieldCheck, HeartPulse, Zap, Activity, ClipboardList, Search, FileText, Upload
+import {
+  Plus, Edit, Trash2, X, Download, FileSpreadsheet, Settings,
+  CheckSquare, Square, ChevronDown, UserCheck, Users, Banknote,
+  ShieldCheck, HeartPulse, Zap, Activity, ClipboardList, Search, FileText, Upload,
+  SlidersHorizontal
 } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -59,37 +60,50 @@ const DIAGNOSIS_GROUPS: Record<string, string[]> = {
 const DIAGNOSIS_CATEGORIES = Object.keys(DIAGNOSIS_GROUPS);
 
 const PATIENT_FLAGS = [
-  { id: 'OPD',            label: 'OPD',              color: 'blue'   },
-  { id: 'Referred',       label: 'Referred',         color: 'amber'  },
-  { id: 'Machine Couch',  label: 'Machine Couch',    color: 'purple' },
-  { id: 'Simulation',     label: 'Simulation',       color: 'teal'   },
+  { id: 'OPD', label: 'OPD', color: 'blue' },
+  { id: 'Referred', label: 'Referred', color: 'amber' },
+  { id: 'Machine Couch', label: 'Machine Couch', color: 'purple' },
+  { id: 'Simulation', label: 'Simulation', color: 'teal' },
   { id: 'Follow-up (Cash)', label: 'Follow-up (Cash)', color: 'orange' },
-  { id: 'Needs Radiotherapy', label: 'Needs RT',     color: 'red'    },
+  { id: 'Needs Radiotherapy', label: 'Needs RT', color: 'red' },
 ];
 
-const PAYMENT_TYPES = ['Cash', 'PM-JAYA', 'Insurance', 'Free'];
+const PAYMENT_TYPES = ['Cash-OPD', 'Cash-IPD', 'Cash-Followup', 'Cash-RT', 'PM-JAYA', 'Insurance', 'Free'];
+
+const SHORT_PAYMENT_LABELS: Record<string, string> = {
+  'Cash-OPD': 'OPD',
+  'Cash-IPD': 'IPD',
+  'Cash-Followup': 'Followup',
+  'Cash-RT': 'RT',
+  'PM-JAYA': 'PM',
+  'Insurance': 'INS',
+  'Free': 'Free'
+};
 
 const GENDERS = ['Male', 'Female', 'Other'];
 
 const MONTHS = [
-  'January','February','March','April','May','June',
-  'July','August','September','October','November','December',
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
 const FLAG_COLORS: Record<string, { bg: string; text: string; ring: string }> = {
-  blue:   { bg: 'bg-blue-50',   text: 'text-blue-700',   ring: 'ring-blue-200'   },
-  amber:  { bg: 'bg-amber-50',  text: 'text-amber-700',  ring: 'ring-amber-200'  },
+  blue: { bg: 'bg-blue-50', text: 'text-blue-700', ring: 'ring-blue-200' },
+  amber: { bg: 'bg-amber-50', text: 'text-amber-700', ring: 'ring-amber-200' },
   purple: { bg: 'bg-purple-50', text: 'text-purple-700', ring: 'ring-purple-200' },
-  teal:   { bg: 'bg-teal-50',   text: 'text-teal-700',   ring: 'ring-teal-200'   },
+  teal: { bg: 'bg-teal-50', text: 'text-teal-700', ring: 'ring-teal-200' },
   orange: { bg: 'bg-orange-50', text: 'text-orange-700', ring: 'ring-orange-200' },
-  red:    { bg: 'bg-red-50',    text: 'text-red-700',    ring: 'ring-red-200'    },
+  red: { bg: 'bg-red-50', text: 'text-red-700', ring: 'ring-red-200' },
 };
 
 const PAYMENT_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
-  Cash:       { bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-500' },
-  'PM-JAYA':  { bg: 'bg-amber-50',   text: 'text-amber-700',   dot: 'bg-amber-500'   },
-  Insurance:  { bg: 'bg-blue-50',    text: 'text-blue-700',    dot: 'bg-blue-500'    },
-  Free:       { bg: 'bg-slate-100',  text: 'text-slate-600',   dot: 'bg-slate-400'   },
+  'Cash-OPD': { bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-500' },
+  'Cash-IPD': { bg: 'bg-cyan-50', text: 'text-cyan-700', dot: 'bg-cyan-500' },
+  'Cash-Followup': { bg: 'bg-teal-50', text: 'text-teal-700', dot: 'bg-teal-500' },
+  'Cash-RT': { bg: 'bg-indigo-50', text: 'text-indigo-700', dot: 'bg-indigo-500' },
+  'PM-JAYA': { bg: 'bg-amber-50', text: 'text-amber-700', dot: 'bg-amber-500' },
+  Insurance: { bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-500' },
+  Free: { bg: 'bg-slate-100', text: 'text-slate-600', dot: 'bg-slate-400' },
 };
 
 // ─── MASTER FIELDS FOR EHR CUSTOMIZATION ─────────────────────────────────────
@@ -117,7 +131,6 @@ const MASTER_FIELDS: FieldConfig[] = [
   { key: "labReportUrl", labelEn: "Lab Reports Note", labelGu: "લેબોરેટરી રીપોર્ટ વિગત", type: "textarea" },
   { key: "nextFollowUp", labelEn: "Next Follow-up Date", labelGu: "આગામી મુલાકાતની તારીખ", type: "date" },
   { key: "billingTotal", labelEn: "Total Fees (₹)", labelGu: "કુલ ફી", type: "number" },
-  { key: "billingPaid", labelEn: "Paid Amount (₹)", labelGu: "ચૂકવેલી રકમ", type: "number" },
   { key: "billingPending", labelEn: "Pending Amount (₹)", labelGu: "બાકી રકમ", type: "number" },
   { key: "paymentMethod", labelEn: "Payment Method", labelGu: "ચુકવણીની પદ્ધતિ", type: "select", options: ["Cash", "UPI/Online", "Card", "Pending"] },
   { key: "allergies", labelEn: "Known Allergies", labelGu: "એલર્જી", type: "textarea" },
@@ -158,102 +171,131 @@ function FlagBadge({ flag }: { flag: string }) {
 }
 
 // ─── DIAGNOSIS SELECTOR COMPONENT ───────────────────────────────────────────
-function DiagnosisSelector({ 
-  category, 
-  diagnosis, 
-  onCategoryChange, 
+function DiagnosisSelector({
+  category,
+  diagnosis,
+  onCategoryChange,
   onDiagnosisChange,
   error
-}: { 
-  category: string; 
-  diagnosis: string; 
-  onCategoryChange: (cat: string) => void; 
-  onDiagnosisChange: (diag: string) => void; 
+}: {
+  category: string;
+  diagnosis: string;
+  onCategoryChange: (cat: string) => void;
+  onDiagnosisChange: (diag: string) => void;
   error?: string;
 }) {
-  const [diagSearch, setDiagSearch] = useState('');
-  const [open, setOpen] = useState(false);
+  const [catSearch, setCatSearch] = useState(category);
+  const [isCatOpen, setIsCatOpen] = useState(false);
 
-  const availableDiagnoses = useMemo(() => {
+  const [diagSearchState, setDiagSearchState] = useState(diagnosis);
+  const [isDiagOpen, setIsDiagOpen] = useState(false);
+
+  // Sync with prop changes
+  useEffect(() => {
+    setCatSearch(category);
+  }, [category]);
+
+  useEffect(() => {
+    setDiagSearchState(diagnosis);
+  }, [diagnosis]);
+
+  const filteredCategories = useMemo(() => {
+    const list = Object.keys(DIAGNOSIS_GROUPS);
+    if (!catSearch?.trim()) return list;
+    return list.filter(c => c.toLowerCase().includes(catSearch.toLowerCase()));
+  }, [catSearch]);
+
+  const filteredDiagnoses = useMemo(() => {
     const list = category ? (DIAGNOSIS_GROUPS[category] || []) : Object.values(DIAGNOSIS_GROUPS).flat();
-    if (!diagSearch.trim()) return list;
-    return list.filter(d => d.toLowerCase().includes(diagSearch.toLowerCase()));
-  }, [category, diagSearch]);
-
-  const handleSelect = (d: string) => {
-    onDiagnosisChange(d);
-    setOpen(false);
-    setDiagSearch('');
-  };
+    const uniqueList = Array.from(new Set(list));
+    if (!diagSearchState?.trim()) return uniqueList;
+    return uniqueList.filter(d => d.toLowerCase().includes(diagSearchState.toLowerCase()));
+  }, [category, diagSearchState]);
 
   return (
     <div className="space-y-3">
-      <div>
-        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
-          Diagnosis Category <span className="text-red-400">*</span>
-        </label>
-        <select
-          value={category}
-          onChange={e => { onCategoryChange(e.target.value); onDiagnosisChange(''); }}
-          className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-800
-            focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
-        >
-          <option value="">Select category…</option>
-          {Object.keys(DIAGNOSIS_GROUPS).map(cat => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </select>
-      </div>
-
-      <div className="relative">
-        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
-          Specific Diagnosis <span className="text-red-400">*</span>
-        </label>
-        <button
-          type="button"
-          onClick={() => setOpen(o => !o)}
-          className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-left flex items-center justify-between
-            focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition hover:border-slate-300"
-        >
-          <span className={diagnosis ? 'text-slate-800' : 'text-slate-400'}>
-            {diagnosis || 'Select diagnosis…'}
-          </span>
-          <ChevronDown size={15} className={`text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} />
-        </button>
-
-        {open && (
-          <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden max-h-60">
-            <div className="p-2 border-b border-slate-100 bg-slate-50">
-              <div className="relative">
-                <Search size={14} className="absolute left-2.5 top-2.5 text-slate-400" />
-                <input
-                  autoFocus
-                  type="text"
-                  placeholder="Search diagnoses…"
-                  value={diagSearch}
-                  onChange={e => setDiagSearch(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 text-sm bg-white border border-slate-200 rounded-lg
-                    focus:outline-none focus:ring-2 focus:ring-brand-500"
-                />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Diagnosis Category */}
+        <div className="relative">
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
+            Diagnosis Category <span className="text-red-400">*</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Select or type category…"
+            value={catSearch}
+            onChange={e => {
+              const val = e.target.value;
+              setCatSearch(val);
+              onCategoryChange(val);
+            }}
+            onFocus={() => setIsCatOpen(true)}
+            onBlur={() => setTimeout(() => setIsCatOpen(false), 200)}
+            className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800
+              focus:outline-none focus:border-brand-500 focus:bg-white transition"
+          />
+          {isCatOpen && filteredCategories.length > 0 && (
+            <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden max-h-48 overflow-y-auto">
+              <div className="py-1">
+                {filteredCategories.map(cat => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => {
+                      setCatSearch(cat);
+                      onCategoryChange(cat);
+                      setIsCatOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-brand-50 hover:text-brand-700 transition"
+                  >
+                    {cat}
+                  </button>
+                ))}
               </div>
             </div>
-            <div className="max-h-44 overflow-y-auto py-1 bg-white">
-              {availableDiagnoses.length === 0 ? (
-                <p className="text-center text-slate-400 text-sm py-4">No diagnoses found</p>
-              ) : availableDiagnoses.map(d => (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => handleSelect(d)}
-                  className={`w-full text-left px-4 py-2 text-sm hover:bg-brand-50 hover:text-brand-700 transition
-                    ${d === diagnosis ? 'bg-brand-50 text-brand-700 font-medium' : 'text-slate-700'}`}
-                >
-                  {d}
-                </button>
-              ))}
+          )}
+        </div>
+
+        {/* Specific Diagnosis */}
+        <div className="relative">
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
+            Specific Diagnosis <span className="text-red-400">*</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Select or type diagnosis…"
+            value={diagSearchState}
+            onChange={e => {
+              const val = e.target.value;
+              setDiagSearchState(val);
+              onDiagnosisChange(val);
+            }}
+            onFocus={() => setIsDiagOpen(true)}
+            onBlur={() => setTimeout(() => setIsDiagOpen(false), 200)}
+            className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800
+              focus:outline-none focus:border-brand-500 focus:bg-white transition"
+          />
+          {isDiagOpen && filteredDiagnoses.length > 0 && (
+            <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden max-h-48 overflow-y-auto">
+              <div className="py-1">
+                {filteredDiagnoses.map(d => (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => {
+                      setDiagSearchState(d);
+                      onDiagnosisChange(d);
+                      setIsDiagOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-brand-50 hover:text-brand-700 transition"
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
       {error && (
         <p className="text-rose-500 text-xs font-semibold mt-1 flex items-center gap-1.5">
@@ -284,6 +326,9 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
   const [filterCategory, setFilterCategory] = useState("");
   const [filterPayment, setFilterPayment] = useState("");
   const [filterFlag, setFilterFlag] = useState("");
+  const [selectedBreakdown, setSelectedBreakdown] = useState<string>("Cash-OPD");
+  const [isBreakdownMenuOpen, setIsBreakdownMenuOpen] = useState(false);
+  const [isCashBreakdownOpen, setIsCashBreakdownOpen] = useState(false);
 
   // Modals state
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -379,6 +424,35 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
     });
   }, [patients, currentMonth, currentYear, searchQuery, filterCategory, filterPayment, filterFlag]);
 
+  // ─── REVENUE COLLECTIONS BREAKDOWN ──────────────────────────────────────────
+  const collections = useMemo(() => {
+    const monthPatients = patients.filter(p => {
+      const pPeriod = getPatientPeriod(p);
+      return pPeriod.month === currentMonth && pPeriod.year === currentYear;
+    });
+
+    const cashOPD = monthPatients.filter(p => p.paymentType === 'Cash-OPD' || p.paymentType === 'Cash').reduce((sum, p) => sum + (parseFloat(p.billingPaid) || 0), 0);
+    const cashIPD = monthPatients.filter(p => p.paymentType === 'Cash-IPD').reduce((sum, p) => sum + (parseFloat(p.billingPaid) || 0), 0);
+    const cashFollowup = monthPatients.filter(p => p.paymentType === 'Cash-Followup').reduce((sum, p) => sum + (parseFloat(p.billingPaid) || 0), 0);
+    const cashRT = monthPatients.filter(p => p.paymentType === 'Cash-RT').reduce((sum, p) => sum + (parseFloat(p.billingPaid) || 0), 0);
+    const pmjaya = monthPatients.filter(p => p.paymentType === 'PM-JAYA').reduce((sum, p) => sum + (parseFloat(p.billingPaid) || 0), 0);
+    const insurance = monthPatients.filter(p => p.paymentType === 'Insurance').reduce((sum, p) => sum + (parseFloat(p.billingPaid) || 0), 0);
+    const free = 0;
+
+    const total = cashOPD + cashIPD + cashFollowup + cashRT + pmjaya + insurance;
+
+    return {
+      'Cash-OPD': cashOPD,
+      'Cash-IPD': cashIPD,
+      'Cash-Followup': cashFollowup,
+      'Cash-RT': cashRT,
+      'PM-JAYA': pmjaya,
+      'Insurance': insurance,
+      'Free': free,
+      total
+    };
+  }, [patients, currentMonth, currentYear]);
+
   // ─── STATS CALCULATIONS (FROM MONTH PATIENTS) ──────────────────────────────
   const stats = useMemo(() => {
     const monthPatients = patients.filter(p => {
@@ -388,7 +462,11 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
 
     return {
       total: monthPatients.length,
-      cash: monthPatients.filter(p => p.paymentType === 'Cash').length,
+      cash: monthPatients.filter(p => ['Cash-OPD', 'Cash-IPD', 'Cash-Followup', 'Cash-RT', 'Cash'].includes(p.paymentType)).length,
+      cashOPD: monthPatients.filter(p => p.paymentType === 'Cash-OPD' || p.paymentType === 'Cash').length,
+      cashIPD: monthPatients.filter(p => p.paymentType === 'Cash-IPD').length,
+      cashFollowup: monthPatients.filter(p => p.paymentType === 'Cash-Followup').length,
+      cashRT: monthPatients.filter(p => p.paymentType === 'Cash-RT').length,
       pmjaya: monthPatients.filter(p => p.paymentType === 'PM-JAYA').length,
       insurance: monthPatients.filter(p => p.paymentType === 'Insurance').length,
       referred: monthPatients.filter(p => (p.flags || []).includes('Referred')).length,
@@ -412,7 +490,13 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
 
   // ─── REAL-TIME FIELD CHANGE HANDLER ───────────────────────────────────────
   const handleFieldChange = (key: string, value: any) => {
-    setFormValues(prev => ({ ...prev, [key]: value }));
+    setFormValues(prev => {
+      const updated = { ...prev, [key]: value };
+      if (key === "paymentType" && value === "Free") {
+        updated.billingPaid = "0";
+      }
+      return updated;
+    });
 
     // Clear validation error when doctor edits/corrects the field
     if (formErrors[key]) {
@@ -427,6 +511,11 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
   // ─── CLINICAL INPUT VALIDATIONS ───────────────────────────────────────────
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
+
+    // 0. Patient ID: Required
+    if (!formValues.patientId?.trim()) {
+      errors.patientId = "Patient ID is required.";
+    }
 
     // 1. Patient Name: Required, letters and spaces only
     if (!formValues.name?.trim()) {
@@ -475,8 +564,8 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
 
     // 7. Billing Amount logic
     const billingTotalEnabled = enabledFields.includes("billingTotal");
-    const billingPaidEnabled = enabledFields.includes("billingPaid");
-    
+    const billingPaidEnabled = true;
+
     let totalVal = 0;
     let paidVal = 0;
 
@@ -505,10 +594,10 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
   // ─── CSV EXPORT ────────────────────────────────────────────────────────────
   const handleExportCSV = () => {
     const headers = [
-      'Patient ID', 'Patient Name', 'Age', 'Gender', 'Diagnosis Category', 
-      'Diagnosis', 'Payment Type', 'Referring Doctor', 'Contact No.', 'Visit Date', 'Flags', 'Notes'
+      'Patient ID', 'Patient Name', 'Age', 'Gender', 'Diagnosis Category',
+      'Diagnosis', 'Payment Type', 'Paid Amount', 'Referring Doctor', 'Contact No.', 'Visit Date', 'Flags', 'Notes'
     ];
-    
+
     // Append dynamically customized fields to headers
     enabledFields.forEach(fKey => {
       const fConfig = MASTER_FIELDS.find(m => m.key === fKey);
@@ -518,7 +607,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
     });
 
     const csvRows = [headers.join(",")];
-    
+
     filteredPatients.forEach(p => {
       const row = [
         p.patientId || '',
@@ -527,7 +616,8 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
         p.gender || '',
         p.diagnosisCategory || '',
         `"${(p.diagnosis || '').replace(/"/g, '""')}"`,
-        p.paymentType || 'Cash',
+        p.paymentType || 'Cash-OPD',
+        p.billingPaid || '0',
         `"${(p.referringDoctor || '').replace(/"/g, '""')}"`,
         p.contact || '',
         p.visitDate || '',
@@ -558,27 +648,49 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
   const handleCSVImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     const reader = new FileReader();
     reader.onload = async (evt) => {
       const text = evt.target?.result as string;
       if (!text) return;
-      
+
       const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
       if (lines.length < 2) {
         showToast("Invalid CSV file.", "error");
         return;
       }
 
-      const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, '').toLowerCase());
+      const parseCSVLine = (textLine: string) => {
+        const result: string[] = [];
+        let current = '';
+        let inQuotes = false;
+        for (let idx = 0; idx < textLine.length; idx++) {
+          const char = textLine[idx];
+          if (char === '"') {
+            if (inQuotes && textLine[idx + 1] === '"') {
+              current += '"';
+              idx++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (char === ',' && !inQuotes) {
+            result.push(current);
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        result.push(current);
+        return result.map(val => val.trim());
+      };
+
+      const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase());
       let okCount = 0;
 
       for (let i = 1; i < lines.length; i++) {
         const line = lines[i];
-        // Split ignoring commas inside quotes
-        const matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
-        const row = matches.map(val => val.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
-        
+        const row = parseCSVLine(line);
+
         const getValue = (keys: string[]) => {
           for (const key of keys) {
             const idx = headers.findIndex(h => h === key.toLowerCase());
@@ -594,8 +706,24 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
         const gender = getValue(['gender']) || 'Male';
         const diagnosisCategory = getValue(['diagnosis category', 'diagnosiscategory', 'category']);
         const diagnosis = getValue(['diagnosis']);
-        const paymentType = getValue(['payment type', 'paymenttype', 'payment']) || 'Cash';
+        const rawPayment = (getValue(['payment type', 'paymenttype', 'payment']) || '').trim();
+        let paymentType = 'Cash-OPD';
+        if (rawPayment) {
+          if (rawPayment === 'Cash') {
+            paymentType = 'Cash-OPD';
+          } else {
+            const matched = PAYMENT_TYPES.find(t => t.toLowerCase() === rawPayment.toLowerCase());
+            if (matched) {
+              paymentType = matched;
+            } else if (rawPayment.toLowerCase().startsWith('cash')) {
+              paymentType = 'Cash-OPD';
+            } else {
+              paymentType = rawPayment;
+            }
+          }
+        }
         const referringDoctor = getValue(['referring doctor', 'referringdoctor']);
+        const billingPaid = getValue(['paid amount', 'paidamount', 'paid', 'billingpaid']) || '0';
         const contact = getValue(['contact', 'phone', 'contact no']);
         const visitDate = getValue(['visit date', 'visitdate', 'date']) || new Date().toISOString().slice(0, 10);
         const flagsStr = getValue(['flags']);
@@ -614,12 +742,12 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
 
         try {
           const payload = {
-            name, age, gender, diagnosisCategory, diagnosis, paymentType, 
-            referringDoctor, contact, visitDate, flags, notes, ...extraData,
+            name, age, gender, diagnosisCategory, diagnosis, paymentType,
+            billingPaid, referringDoctor, contact, visitDate, flags, notes, ...extraData,
             month: currentMonth,
             year: currentYear
           };
-          
+
           await fetch("/api/patients", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -634,7 +762,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
       showToast(`Imported ${okCount} patients successfully!`, "success");
       fetchInitialData();
     };
-    
+
     reader.readAsText(file);
     e.target.value = ''; // Reset input
   };
@@ -642,7 +770,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
   // ─── PDF LIST DIRECTORY GENERATION ─────────────────────────────────────────
   const handleExportListPDF = () => {
     const doc = new jsPDF("l", "mm", "a4"); // Landscape
-    
+
     doc.setFont("Helvetica", "bold");
     doc.setFontSize(14);
     doc.text(`Dr. Sarthak Kumar Mohanty - Clinical Registry Directory (${MONTHS[currentMonth - 1]} ${currentYear})`, 14, 15);
@@ -650,7 +778,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
     doc.setFontSize(9);
     doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 20);
 
-    const tableHeaders = ["#", "Patient", "Age/Sex", "Diagnosis", "Payment", "Referring Dr", "Date", "Flags"];
+    const tableHeaders = ["#", "Patient", "Age/Sex", "Diagnosis", "Payment", "Paid Amount (Rs.)", "Referring Dr", "Date", "Flags"];
     enabledFields.forEach(fKey => {
       const fConfig = MASTER_FIELDS.find(m => m.key === fKey);
       if (fConfig) tableHeaders.push(fConfig.labelEn);
@@ -663,6 +791,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
         `${p.age || "-"}/${p.gender?.charAt(0) || "-"}`,
         `${p.diagnosisCategory || "-"}\n(${p.diagnosis || "-"})`,
         p.paymentType || "-",
+        p.billingPaid !== undefined && p.billingPaid !== null && p.billingPaid !== "" ? Number(p.billingPaid).toLocaleString('en-IN') : "0",
         p.referringDoctor || "-",
         formatDate(p.visitDate),
         (p.flags || []).join(", ")
@@ -674,12 +803,24 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
       return row;
     });
 
+    // Calculate total paid amount
+    const totalPaid = filteredPatients.reduce((sum, p) => sum + (parseFloat(p.billingPaid) || 0), 0);
+
+    const tableFooters = tableHeaders.map(header => {
+      if (header === "Paid Amount (Rs.)") {
+        return totalPaid.toLocaleString('en-IN');
+      }
+      return "";
+    });
+
     autoTable(doc, {
       startY: 26,
       head: [tableHeaders],
       body: tableData,
+      foot: [tableFooters],
       theme: "striped",
       headStyles: { fillColor: [79, 70, 229] }, // brand-600
+      footStyles: { fillColor: [248, 250, 252], textColor: [15, 23, 42], fontStyle: "bold" },
       styles: { fontSize: 8, font: "Helvetica" },
       margin: { top: 25 },
       didDrawPage: function (data: any) {
@@ -695,7 +836,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
   // ─── PATIENT CASE PAPER LETTERHEAD PDF ─────────────────────────────────────
   const handleExportPatientCasePDF = (patient: any) => {
     const doc = new jsPDF("p", "mm", "a4");
-    
+
     // Modern Header (Clinical Letterhead)
     doc.setFillColor(15, 23, 42); // slate-900
     doc.rect(0, 0, 210, 40, "F");
@@ -724,12 +865,13 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
     doc.setFont("Helvetica", "bold");
     doc.setFontSize(9);
     doc.setTextColor(100, 116, 139); // slate-500
-    
+
     doc.text("PATIENT ID:", 15, 65);
     doc.text("FULL NAME:", 15, 72);
     doc.text("AGE / GENDER:", 15, 79);
     doc.text("CONTACT NO:", 15, 86);
     doc.text("VISIT DATE:", 15, 93);
+    doc.text("PAID AMOUNT:", 15, 100);
 
     doc.setFont("Helvetica", "bold");
     doc.setTextColor(15, 23, 42);
@@ -738,6 +880,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
     doc.text(`${patient.age || "-"} Years / ${patient.gender || "-"}`, 50, 79);
     doc.text(patient.contact || "-", 50, 86);
     doc.text(formatDate(patient.visitDate) || "-", 50, 93);
+    doc.text(patient.billingPaid !== undefined && patient.billingPaid !== null && patient.billingPaid !== "" ? `Rs. ${Number(patient.billingPaid).toLocaleString('en-IN')}` : "Rs. 0", 50, 100);
 
     doc.setFont("Helvetica", "bold");
     doc.setTextColor(100, 116, 139);
@@ -759,13 +902,13 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
     doc.setFont("Helvetica", "bold");
     doc.setFontSize(12);
     doc.setTextColor(15, 23, 42);
-    doc.text("CLINICAL AND EHR RECORD DETAILS", 15, 108);
-    doc.line(15, 111, 195, 111);
+    doc.text("CLINICAL AND EHR RECORD DETAILS", 15, 114);
+    doc.line(15, 117, 195, 117);
 
-    let startY = 120;
+    let startY = 126;
     doc.setFont("Helvetica", "bold");
     doc.setFontSize(9);
-    
+
     // Notes block
     if (patient.notes) {
       doc.setTextColor(100, 116, 139);
@@ -783,13 +926,13 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
         doc.setFont("Helvetica", "bold");
         doc.setTextColor(100, 116, 139);
         doc.text(`${fConfig.labelEn.toUpperCase()}:`, 15, startY);
-        
+
         doc.setFont("Helvetica", "normal");
         doc.setTextColor(51, 65, 85);
         const valStr = String(patient[fKey]);
         const splitText = doc.splitTextToSize(valStr, 140);
         doc.text(splitText, 50, startY);
-        
+
         startY += Math.max(8, splitText.length * 5);
         if (startY > 270) {
           doc.addPage();
@@ -815,8 +958,10 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
   const handleOpenAdd = () => {
     setEditingPatient(null);
     setFormValues({
+      patientId: "",
       name: "", age: "", gender: "Male", visitDate: new Date().toISOString().slice(0, 10),
-      diagnosisCategory: "", diagnosis: "", paymentType: "Cash",
+      diagnosisCategory: "", diagnosis: "", paymentType: "Cash-OPD",
+      billingPaid: "",
       referringDoctor: "", contact: "", flags: [], notes: ""
     });
     setFormErrors({});
@@ -841,7 +986,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
 
   const handleSubmitRecord = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Run clinical input validation check
     if (!validateForm()) {
       showToast("Please correct the clinical validation errors.", "error");
@@ -862,7 +1007,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
         res = await fetch("/api/patients", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...payload, patientId: editingPatient.patientId })
+          body: JSON.stringify({ ...payload, oldPatientId: editingPatient.patientId })
         });
       } else {
         res = await fetch("/api/patients", {
@@ -877,7 +1022,8 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
         setIsFormOpen(false);
         fetchInitialData();
       } else {
-        showToast("Failed to save patient record.", "error");
+        const errData = await res.json().catch(() => ({}));
+        showToast(errData.error || "Failed to save patient record.", "error");
       }
     } catch (err) {
       showToast("Network error submitting patient record.", "error");
@@ -940,12 +1086,12 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
             <span>Patient Registry</span>
             <span className="text-xs bg-brand-50 text-brand-700 border border-brand-100 font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Local DB</span>
           </h1>
-          <p className="text-slate-600 mt-1">June 2026 · HCG Hospital, Rajkot</p>
+          <p className="text-slate-600 mt-1">{MONTHS[currentMonth - 1]} {currentYear} · HCG Hospital, Rajkot</p>
         </div>
 
         {/* Period Selector (Month Navigator) */}
         <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl px-2 py-1.5 shrink-0 text-white shadow-sm">
-          <button 
+          <button
             onClick={() => navigateMonth(-1)}
             className="p-1.5 rounded-lg hover:bg-slate-800 transition text-slate-400 hover:text-white"
             title="Previous Month"
@@ -956,7 +1102,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
             <p className="font-bold text-sm font-heading">{MONTHS[currentMonth - 1]}</p>
             <p className="text-slate-400 text-[10px] uppercase font-bold mt-0.5 tracking-wider">{currentYear}</p>
           </div>
-          <button 
+          <button
             onClick={() => navigateMonth(1)}
             className="p-1.5 rounded-lg hover:bg-slate-800 transition text-slate-400 hover:text-white"
             title="Next Month"
@@ -967,16 +1113,189 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
       </div>
 
       {/* STATS CARDS */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3.5">
+        {/* Row 1 standard cards */}
         {[
           { key: 'total', label: 'Total Patients', icon: Users, val: stats.total, color: 'bg-brand-50 text-brand-600 border border-brand-100' },
-          { key: 'cash', label: 'Cash', icon: Banknote, val: stats.cash, color: 'bg-emerald-50 text-emerald-600 border border-emerald-100' },
+          { key: 'cash', label: 'Cash', icon: Banknote, val: stats.cash, color: 'bg-emerald-50 text-emerald-600 border border-emerald-100', isInteractive: true },
           { key: 'pmjaya', label: 'PM-JAYA', icon: ShieldCheck, val: stats.pmjaya, color: 'bg-amber-50 text-amber-600 border border-amber-100' },
           { key: 'insurance', label: 'Insurance', icon: HeartPulse, val: stats.insurance, color: 'bg-sky-50 text-sky-600 border border-sky-100' },
-          { key: 'referred', label: 'Referrals', icon: UserCheck, val: stats.referred, color: 'bg-violet-50 text-violet-600 border border-violet-100' },
+        ].map((s, i) => {
+          const Icon = s.icon;
+          return (
+            <div key={s.key} className="relative">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.03 }}
+                onClick={() => {
+                  if (s.isInteractive) {
+                    setIsCashBreakdownOpen(!isCashBreakdownOpen);
+                  }
+                }}
+                className={`bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow ${
+                  s.isInteractive ? 'cursor-pointer hover:border-emerald-200' : ''
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${s.color}`}>
+                  <Icon size={18} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-semibold text-slate-500 leading-none mb-1 truncate">{s.label}</p>
+                  {loading ? (
+                    <div className="h-5 w-8 bg-slate-100 rounded animate-pulse" />
+                  ) : (
+                    <p className="text-2xl font-bold font-heading text-slate-900 leading-none">{s.val}</p>
+                  )}
+                </div>
+              </motion.div>
+
+              {s.isInteractive && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsCashBreakdownOpen(!isCashBreakdownOpen);
+                  }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition z-10 shadow-sm"
+                  title="View Cash Breakdown"
+                >
+                  <SlidersHorizontal size={14} />
+                </button>
+              )}
+
+              {s.key === 'cash' && isCashBreakdownOpen && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-30" 
+                    onClick={() => setIsCashBreakdownOpen(false)} 
+                  />
+                  <div className="absolute left-0 mt-1 w-44 bg-white border border-slate-100 rounded-xl shadow-xl p-2.5 z-40">
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-2 pb-1 border-b border-slate-100">
+                      Cash Patients
+                    </p>
+                    <div className="space-y-1.5">
+                      {[
+                        { label: 'OPD', count: stats.cashOPD },
+                        { label: 'IPD', count: stats.cashIPD },
+                        { label: 'Followup', count: stats.cashFollowup },
+                        { label: 'RT', count: stats.cashRT }
+                      ].map((item) => (
+                        <div key={item.label} className="flex items-center justify-between text-[11px]">
+                          <span className="font-semibold text-slate-500">{item.label}</span>
+                          <span className="font-bold text-slate-800 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 min-w-5 text-center">
+                            {item.count}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          );
+        })}
+
+        {/* REVENUE COLLECTIONS BREAKDOWN (Spans 2 rows on desktop) */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="col-span-2 lg:col-span-1 lg:row-span-2 bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow"
+        >
+          <div className="flex items-center justify-between gap-1.5 border-b border-slate-100 pb-2 mb-2">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <Banknote size={16} />
+            </div>
+            {/* Dropdown selector for breakdown */}
+            <div className="relative shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsBreakdownMenuOpen(!isBreakdownMenuOpen)}
+                className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition"
+                title="Select Payment Type"
+              >
+                <SlidersHorizontal size={14} />
+              </button>
+
+              {isBreakdownMenuOpen && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-10" 
+                    onClick={() => setIsBreakdownMenuOpen(false)} 
+                  />
+                  <div className="absolute right-0 mt-1 w-36 bg-white border border-slate-100 rounded-xl shadow-xl py-1 z-20 max-h-48 overflow-y-auto">
+                    {Object.keys(collections)
+                      .filter(key => key !== 'total' && key !== 'Free')
+                      .map(key => (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={() => {
+                            setSelectedBreakdown(key);
+                            setIsBreakdownMenuOpen(false);
+                          }}
+                          className={`w-full text-left px-3 py-1.5 text-[11px] font-semibold transition ${
+                            selectedBreakdown === key 
+                              ? 'bg-brand-50 text-brand-700' 
+                              : 'text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          {key}
+                        </button>
+                      ))
+                    }
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="flex-1 flex flex-col justify-center min-h-0 mt-1">
+            {/* Total Box */}
+            <div className="flex items-center justify-between p-2 bg-emerald-50/50 rounded-xl border border-emerald-100/60 mb-2">
+              <div className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider flex items-center gap-1.5">
+                <Banknote size={14} className="shrink-0 text-emerald-600" />
+                <span>Total</span>
+              </div>
+              <span className="text-xs font-extrabold text-slate-800">
+                ₹{collections.total.toLocaleString('en-IN')}
+              </span>
+            </div>
+
+            {/* Divider Line */}
+            <div className="border-t border-dashed border-slate-200 my-1" />
+
+            {/* Selected Breakdown Box */}
+            <div className="flex flex-col gap-1.5 overflow-y-auto max-h-[90px] pr-1 mt-1">
+              {Object.entries(collections)
+                .filter(([key]) => key !== 'total')
+                .filter(([key]) => key === selectedBreakdown)
+                .map(([key, val]) => {
+                  const styles = PAYMENT_COLORS[key] || { bg: 'bg-slate-100', text: 'text-slate-600', dot: 'bg-slate-400' };
+                  const shortLabel = SHORT_PAYMENT_LABELS[key] || key;
+                  return (
+                    <div key={key} className="flex items-center justify-between p-2 bg-slate-50 rounded-xl border border-slate-100 min-w-0">
+                      <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wide truncate flex items-center gap-1.5">
+                        <Banknote size={14} className={`shrink-0 ${styles.text}`} />
+                        <span>{shortLabel}</span>
+                      </div>
+                      <span className="text-xs font-extrabold text-slate-800">
+                        ₹{val.toLocaleString('en-IN')}
+                      </span>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Row 2 standard cards */}
+        {[
           { key: 'simulation', label: 'Simulations', icon: Activity, val: stats.simulation, color: 'bg-teal-50 text-teal-600 border border-teal-100' },
           { key: 'needsRT', label: 'Needs RT', icon: Zap, val: stats.needsRT, color: 'bg-rose-50 text-rose-600 border border-rose-100' },
           { key: 'followup', label: 'Follow-ups', icon: ClipboardList, val: stats.followup, color: 'bg-orange-50 text-orange-600 border border-orange-100' },
+          { key: 'referred', label: 'Referrals', icon: UserCheck, val: stats.referred, color: 'bg-violet-50 text-violet-600 border border-violet-100' },
         ].map((s, i) => {
           const Icon = s.icon;
           return (
@@ -984,7 +1303,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
               key={s.key}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.03 }}
+              transition={{ delay: (i + 4) * 0.03 }}
               className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow"
             >
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${s.color}`}>
@@ -1008,8 +1327,8 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
         {/* Search */}
         <div className="relative w-full sm:flex-1 sm:min-w-[240px]">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Search name, diagnosis, referring doctor..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -1053,43 +1372,43 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
 
         {/* Action buttons */}
         <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
-          <button 
+          <button
             onClick={() => setIsSettingsOpen(true)}
             className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 border border-slate-200 bg-white rounded-lg hover:bg-slate-50 transition"
             title="Configure EHR clinical fields"
           >
             <Settings size={14} /> Customize
           </button>
-          
-          <input 
-            ref={csvInputRef} 
-            type="file" 
-            accept=".csv" 
-            className="hidden" 
-            onChange={handleCSVImport} 
+
+          <input
+            ref={csvInputRef}
+            type="file"
+            accept=".csv"
+            className="hidden"
+            onChange={handleCSVImport}
           />
-          <button 
+          <button
             onClick={() => csvInputRef.current?.click()}
             className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 border border-slate-200 bg-white rounded-lg hover:bg-slate-50 transition"
           >
             <Upload size={14} /> Import
           </button>
 
-          <button 
+          <button
             onClick={handleExportCSV}
             className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 border border-slate-200 bg-white rounded-lg hover:bg-slate-50 transition"
           >
             <FileSpreadsheet size={14} /> Export CSV
           </button>
 
-          <button 
+          <button
             onClick={handleExportListPDF}
             className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-rose-600 border border-rose-200 bg-white rounded-lg hover:bg-rose-50 transition"
           >
             <Download size={14} /> Export PDF
           </button>
 
-          <button 
+          <button
             onClick={handleOpenAdd}
             className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-brand-600 rounded-lg hover:bg-brand-700 transition"
           >
@@ -1120,10 +1439,12 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
               <thead className="border-b border-slate-100 bg-slate-50/60">
                 <tr className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
                   <th className="px-4 py-3 w-10">#</th>
+                  <th className="px-4 py-3">Patient ID</th>
                   <th className="px-4 py-3">Patient</th>
                   <th className="px-4 py-3">Age / Sex</th>
                   <th className="px-4 py-3">Diagnosis</th>
                   <th className="px-4 py-3">Payment</th>
+                  <th className="px-4 py-3">Paid Amount</th>
                   <th className="px-4 py-3">Referring Dr.</th>
                   <th className="px-4 py-3">Date</th>
                   <th className="px-4 py-3">Flags</th>
@@ -1143,6 +1464,9 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
                 {filteredPatients.map((p, idx) => (
                   <tr key={p.patientId} className="group hover:bg-brand-50/40 transition-colors">
                     <td className="px-4 py-3 text-xs text-slate-400 font-normal">{idx + 1}</td>
+                    <td className="px-4 py-3 text-brand-600 font-mono font-semibold text-xs whitespace-nowrap">
+                      {p.patientId}
+                    </td>
                     <td className="px-4 py-3">
                       <p className="text-sm font-semibold text-slate-900 leading-none">{p.name}</p>
                       {p.contact && <p className="text-xs text-slate-400 mt-1 font-normal">{p.contact}</p>}
@@ -1157,6 +1481,9 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
                     <td className="px-4 py-3">
                       <PaymentBadge type={p.paymentType} />
                     </td>
+                    <td className="px-4 py-3 text-slate-900 font-semibold">
+                      {p.billingPaid !== undefined && p.billingPaid !== null && p.billingPaid !== "" ? `₹${Number(p.billingPaid).toLocaleString('en-IN')}` : "₹0"}
+                    </td>
                     <td className="px-4 py-3 text-slate-600 font-normal">{p.referringDoctor || "—"}</td>
                     <td className="px-4 py-3 text-slate-500 font-normal whitespace-nowrap">{formatDate(p.visitDate)}</td>
                     <td className="px-4 py-3">
@@ -1164,7 +1491,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
                         {(p.flags || []).map((f: string) => <FlagBadge key={f} flag={f} />)}
                       </div>
                     </td>
-                    
+
                     {/* Render customized dynamic fields values */}
                     {enabledFields.map(fKey => {
                       const val = p[fKey];
@@ -1178,21 +1505,21 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
                     {/* Action buttons */}
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button 
+                        <button
                           onClick={() => handleExportPatientCasePDF(p)}
                           title="Print Patient Case Sheet"
                           className="p-1.5 rounded-lg text-brand-600 hover:bg-brand-50 transition"
                         >
                           <FileText size={14} />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleOpenEdit(p)}
                           title="Edit Patient Details"
                           className="p-1.5 rounded-lg text-slate-400 hover:text-brand-600 hover:bg-brand-50 transition"
                         >
                           <Edit size={14} />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDeletePatient(p.patientId)}
                           title="Delete permanently"
                           className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition"
@@ -1213,7 +1540,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
       <AnimatePresence>
         {isFormOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
@@ -1229,7 +1556,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
                     {editingPatient ? `Editing patient record ID: ${editingPatient.patientId}` : "Fill in HCG clinical details below"}
                   </p>
                 </div>
-                <button 
+                <button
                   onClick={() => setIsFormOpen(false)}
                   className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition"
                 >
@@ -1240,13 +1567,33 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
               {/* Form body */}
               <form onSubmit={handleSubmitRecord} className="flex-1 overflow-y-auto">
                 <div className="p-6 space-y-5">
-                  
+
+                  {/* Patient ID */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
+                      Patient ID <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. PAT-1683FE7C"
+                      value={formValues.patientId || ""}
+                      onChange={(e) => handleFieldChange("patientId", e.target.value)}
+                      className={`w-full px-3 py-2.5 bg-slate-50 border rounded-lg text-sm focus:outline-none focus:bg-white transition
+                        ${formErrors.patientId ? 'border-rose-400 focus:border-rose-400 focus:ring-1 focus:ring-rose-400' : 'border-slate-200 focus:border-brand-500'}`}
+                    />
+                    {formErrors.patientId && (
+                      <p className="text-rose-500 text-xs font-semibold mt-1.5 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500" /> {formErrors.patientId}
+                      </p>
+                    )}
+                  </div>
+
                   {/* Name */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
                       Full Name <span className="text-red-500">*</span>
                     </label>
-                    <input 
+                    <input
                       type="text"
                       placeholder="e.g. Ramesh Patel"
                       value={formValues.name || ""}
@@ -1267,7 +1614,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
                       <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
                         Age
                       </label>
-                      <input 
+                      <input
                         type="number"
                         placeholder="e.g. 58"
                         value={formValues.age || ""}
@@ -1285,7 +1632,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
                       <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
                         Gender
                       </label>
-                      <select 
+                      <select
                         value={formValues.gender || "Male"}
                         onChange={(e) => handleFieldChange("gender", e.target.value)}
                         className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-brand-500 focus:bg-white transition"
@@ -1297,7 +1644,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
                       <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
                         Visit Date <span className="text-red-500">*</span>
                       </label>
-                      <input 
+                      <input
                         type="date"
                         value={formValues.visitDate || ""}
                         onChange={(e) => handleFieldChange("visitDate", e.target.value)}
@@ -1313,7 +1660,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
                   </div>
 
                   {/* Diagnosis Selector */}
-                  <DiagnosisSelector 
+                  <DiagnosisSelector
                     category={formValues.diagnosisCategory || ""}
                     diagnosis={formValues.diagnosis || ""}
                     onCategoryChange={(cat) => handleFieldChange("diagnosisCategory", cat)}
@@ -1321,14 +1668,14 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
                     error={formErrors.diagnosisCategory || formErrors.diagnosis}
                   />
 
-                  {/* Payment, Referring Doctor & Contact */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* Payment Info */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
                         Payment Type <span className="text-red-500">*</span>
                       </label>
-                      <select 
-                        value={formValues.paymentType || "Cash"}
+                      <select
+                        value={formValues.paymentType || "Cash-OPD"}
                         onChange={(e) => handleFieldChange("paymentType", e.target.value)}
                         className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-brand-500 focus:bg-white transition"
                       >
@@ -1337,9 +1684,32 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
+                        Paid Amount (₹) <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        placeholder="e.g. 1500"
+                        value={formValues.billingPaid ?? ""}
+                        onChange={(e) => handleFieldChange("billingPaid", e.target.value)}
+                        className={`w-full px-3 py-2.5 bg-slate-50 border rounded-lg text-sm focus:outline-none focus:bg-white transition ${
+                          formErrors.billingPaid ? 'border-rose-400 focus:border-rose-400' : 'border-slate-200 focus:border-brand-500'
+                        }`}
+                      />
+                      {formErrors.billingPaid && (
+                        <p className="text-rose-500 text-xs font-semibold mt-1.5 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-rose-500" /> {formErrors.billingPaid}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Referral & Contact Info */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
                         Referring Doctor
                       </label>
-                      <input 
+                      <input
                         type="text"
                         placeholder="e.g. Dr. Sharma"
                         value={formValues.referringDoctor || ""}
@@ -1351,7 +1721,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
                       <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
                         Contact No.
                       </label>
-                      <input 
+                      <input
                         type="tel"
                         placeholder="e.g. 9876543210"
                         value={formValues.contact || ""}
@@ -1401,7 +1771,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
                     <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
                       Clinical Notes
                     </label>
-                    <textarea 
+                    <textarea
                       placeholder="Special instructions, staging details, clinical observations..."
                       value={formValues.notes || ""}
                       onChange={(e) => handleFieldChange("notes", e.target.value)}
@@ -1469,15 +1839,15 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
 
                 {/* Footer */}
                 <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-end gap-3 bg-slate-50/50">
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={() => setIsFormOpen(false)}
                     className="px-4 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition"
                   >
                     Cancel
                   </button>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     disabled={saving}
                     className="px-5 py-2 text-sm font-semibold text-white bg-brand-600 rounded-lg hover:bg-brand-700 transition disabled:opacity-60"
                   >
@@ -1494,7 +1864,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
       <AnimatePresence>
         {isSettingsOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
@@ -1505,7 +1875,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
                   <h3 className="font-bold text-slate-900 text-lg leading-none">Customize Clinical Record Fields</h3>
                   <p className="text-slate-500 text-xs mt-1.5">Select extra fields to enable in your dynamic clinical EHR directory</p>
                 </div>
-                <button 
+                <button
                   onClick={() => setIsSettingsOpen(false)}
                   className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition"
                 >
@@ -1520,11 +1890,10 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
                     <button
                       key={f.key}
                       onClick={() => toggleSettingField(f.key)}
-                      className={`flex items-center space-x-3.5 p-3.5 rounded-xl border text-left transition-all ${
-                        isChecked
+                      className={`flex items-center space-x-3.5 p-3.5 rounded-xl border text-left transition-all ${isChecked
                           ? "bg-brand-50 border-brand-200 text-slate-900 shadow-sm"
                           : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50"
-                      }`}
+                        }`}
                     >
                       <div className={isChecked ? "text-brand-600" : "text-slate-400"}>
                         {isChecked ? <CheckSquare size={18} /> : <Square size={18} />}
@@ -1539,13 +1908,13 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
               </div>
 
               <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-end gap-3 bg-slate-50/50">
-                <button 
+                <button
                   onClick={() => setIsSettingsOpen(false)}
                   className="px-4 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   onClick={handleSaveSettings}
                   className="px-5 py-2 text-sm font-semibold text-white bg-brand-600 rounded-lg hover:bg-brand-700 transition"
                 >
