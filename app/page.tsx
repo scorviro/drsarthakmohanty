@@ -33,23 +33,61 @@ export default async function Home() {
   const pinnedReviews = approvedReviews.filter((r) => r.isPinned);
   const articles = await getDbArticles();
 
+  // Calculate dynamic review aggregate rating
+  const reviewCount = approvedReviews.length;
+  const ratingSum = approvedReviews.reduce((sum, r) => sum + r.rating, 0);
+  const ratingValue = reviewCount > 0 ? (ratingSum / reviewCount).toFixed(1) : "5.0";
+
+  const reviewsSchema = {
+    "@context": "https://schema.org",
+    "@type": "Physician",
+    "@id": "https://drsarthakkumarmohanty.in/#physician",
+    "name": "Dr. Sarthak Kumar Mohanty",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": ratingValue,
+      "reviewCount": reviewCount > 0 ? reviewCount : 1,
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "review": approvedReviews.slice(0, 5).map((r) => ({
+      "@type": "Review",
+      "author": {
+        "@type": "Person",
+        "name": r.name || "Anonymous Patient"
+      },
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": r.rating,
+        "bestRating": "5"
+      },
+      "reviewBody": r.reviewText || "Highly professional care and treatment."
+    }))
+  };
+
   return (
-    <main className="min-h-screen relative pt-[96px] selection:bg-brand-teal/30 selection:text-slate-900">
-      <Navbar />
-      <HeroSection />
-      <TrustStrip />
-      <AboutSection />
-      <TreatmentsGrid />
-      <CancerTypes />
-      <BlogTeaser initialArticles={articles} />
-      <Testimonials initialReviews={pinnedReviews} />
-      <FAQAccordion />
-      <GoogleReviews />
-      <BookingWizard />
-      <LocationMap />
-      <ContactSection />
-      <Footer />
-    </main>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewsSchema) }}
+      />
+      <main className="min-h-screen relative pt-[96px] selection:bg-brand-teal/30 selection:text-slate-900">
+        <Navbar />
+        <HeroSection />
+        <TrustStrip />
+        <AboutSection />
+        <TreatmentsGrid />
+        <CancerTypes />
+        <BlogTeaser initialArticles={articles} />
+        <Testimonials initialReviews={pinnedReviews} />
+        <FAQAccordion />
+        <GoogleReviews />
+        <BookingWizard />
+        <LocationMap />
+        <ContactSection />
+        <Footer />
+      </main>
+    </>
   );
 }
 

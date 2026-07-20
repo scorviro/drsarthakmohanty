@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { Award, Briefcase, GraduationCap, Users, X, Check, Globe } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
+import Link from "next/link";
 
 export default function AboutSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -437,12 +438,12 @@ export default function AboutSection() {
                 </div>
               ))}
             </div>
-            <button 
-              onClick={() => { setIsModalOpen(true); setSpreadIndex(0); }}
-              className="mt-12 glass-panel text-brand-teal px-8 py-3 rounded-full font-medium hover:bg-brand-teal hover:text-slate-900 transition-all border border-brand-teal/50 active:scale-95 duration-200"
+            <Link 
+              href="/dr-sarthak-kumar-mohanty"
+              className="mt-12 inline-block glass-panel text-brand-teal px-8 py-3 rounded-full font-medium hover:bg-brand-teal hover:text-slate-900 transition-all border border-brand-teal/50 active:scale-95 duration-200"
             >
               {t("about.read_profile")}
-            </button>
+            </Link>
           </div>
           
         </div>

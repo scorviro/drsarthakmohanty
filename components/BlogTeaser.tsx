@@ -211,15 +211,10 @@ export default function BlogTeaser({ initialArticles = [] }: { initialArticles?:
         {/* Highlighted Articles Grid */}
         <div className="grid md:grid-cols-3 gap-8">
           {previewArticles.map((article) => (
-            <motion.div
+            <Link
               key={article.id}
-              whileHover={{ y: -8 }}
-              onClick={() => {
-                addToRecentlyViewed(article.id);
-                setActiveArticle(article);
-                setIsModalOpen(true);
-              }}
-              className="glass-panel-strong group cursor-pointer overflow-hidden rounded-[32px] border border-slate-200/60 bg-white shadow-xl/5 flex flex-col h-full"
+              href={`/blog/${article.slug}`}
+              className="glass-panel-strong group cursor-pointer overflow-hidden rounded-[32px] border border-slate-200/60 bg-white shadow-xl/5 flex flex-col h-full transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
             >
               <div className="h-56 overflow-hidden relative bg-gradient-to-br from-brand-teal/15 to-slate-900 flex items-center justify-center">
                 <Stethoscope className="text-brand-teal/20 absolute" size={40} />
@@ -256,13 +251,19 @@ export default function BlogTeaser({ initialArticles = [] }: { initialArticles?:
                   
                   <div className="flex space-x-2">
                     <button 
-                      onClick={(e) => toggleBookmark(article.id, e)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        toggleBookmark(article.id, e);
+                      }}
                       className={`p-2 rounded-xl border transition-colors ${bookmarks.includes(article.id) ? "bg-brand-teal/10 border-brand-teal/30 text-brand-teal" : "border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50"}`}
                     >
                       <Bookmark size={16} fill={bookmarks.includes(article.id) ? "currentColor" : "none"} />
                     </button>
                     <button 
-                      onClick={(e) => shareArticle(article, e)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        shareArticle(article, e);
+                      }}
                       className="p-2 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors relative"
                     >
                       {copiedId === article.id ? <Check size={16} className="text-emerald-500 animate-pulse" /> : <Share2 size={16} />}
@@ -270,7 +271,7 @@ export default function BlogTeaser({ initialArticles = [] }: { initialArticles?:
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </Link>
           ))}
         </div>
       </div>
@@ -539,11 +540,10 @@ export default function BlogTeaser({ initialArticles = [] }: { initialArticles?:
                       {filteredArticles.length > 0 ? (
                         <div className="grid md:grid-cols-2 gap-6">
                           {filteredArticles.map((article) => (
-                            <motion.div
+                            <Link
                               key={article.id}
-                              whileHover={{ y: -4, boxShadow: "0 8px 24px rgba(0,0,0,0.04)" }}
-                              onClick={() => { addToRecentlyViewed(article.id); setActiveArticle(article); }}
-                              className="p-6 rounded-[24px] border border-slate-200/50 bg-white hover:border-brand-teal/20 transition-all flex flex-col justify-between cursor-pointer h-64 shadow-sm"
+                              href={`/blog/${article.slug}`}
+                              className="p-6 rounded-[24px] border border-slate-200/50 bg-white hover:border-brand-teal/20 transition-all flex flex-col justify-between cursor-pointer h-64 shadow-sm hover:-translate-y-1 hover:shadow-md duration-350"
                             >
                               <div>
                                 <div className="flex items-center justify-between mb-4">
@@ -570,20 +570,26 @@ export default function BlogTeaser({ initialArticles = [] }: { initialArticles?:
                                 </span>
                                 <div className="flex space-x-1">
                                   <button
-                                    onClick={(e) => toggleBookmark(article.id, e)}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      toggleBookmark(article.id, e);
+                                    }}
                                     className={`p-2 rounded-lg transition-colors ${bookmarks.includes(article.id) ? "text-brand-teal bg-brand-teal/5" : "text-slate-350 hover:text-slate-500 hover:bg-slate-50"}`}
                                   >
                                     <Bookmark size={14} fill={bookmarks.includes(article.id) ? "currentColor" : "none"} />
                                   </button>
                                   <button
-                                    onClick={(e) => shareArticle(article, e)}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      shareArticle(article, e);
+                                    }}
                                     className="p-2 rounded-lg text-slate-350 hover:text-slate-500 hover:bg-slate-50 transition-colors"
                                   >
                                     {copiedId === article.id ? <Check size={14} className="text-emerald-500" /> : <Share2 size={14} />}
                                   </button>
                                 </div>
                               </div>
-                            </motion.div>
+                            </Link>
                           ))}
                         </div>
                       ) : (

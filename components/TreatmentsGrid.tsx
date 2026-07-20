@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
 import { Activity, Target, Zap, CircleDot, ShieldPlus, Dna, BrainCircuit, HeartPulse, X } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
+import Link from "next/link";
 
 interface TiltCardProps {
   title: string;
@@ -120,14 +121,14 @@ export default function TreatmentsGrid() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const treatments = [
-    { title: "IMRT", desc: t("treatments.imrt_desc"), icon: <Activity />, image: "/therapypics/IMRT.jpeg" },
-    { title: "IGRT", desc: t("treatments.igrt_desc"), icon: <Target />, image: "/therapypics/IGRT.jpeg" },
-    { title: "VMAT", desc: t("treatments.vmat_desc"), icon: <Zap />, image: "/therapypics/VMAT.jpeg" },
-    { title: "SBRT", desc: t("treatments.sbrt_desc"), icon: <CircleDot />, image: "/therapypics/SBRT.jpeg" },
-    { title: "SRS", desc: t("treatments.srs_desc"), icon: <BrainCircuit />, image: "/therapypics/SRS.jpeg" },
-    { title: "3D-CRT", desc: t("treatments.crt_desc"), icon: <Dna /> },
-    { title: t("treatments.brachy_title"), desc: t("treatments.brachy_desc"), icon: <ShieldPlus /> },
-    { title: t("treatments.palliative_title"), desc: t("treatments.palliative_desc"), icon: <HeartPulse /> },
+    { title: "IMRT", slug: "imrt", desc: t("treatments.imrt_desc"), icon: <Activity />, image: "/therapypics/IMRT.jpeg" },
+    { title: "IGRT", slug: "igrt", desc: t("treatments.igrt_desc"), icon: <Target />, image: "/therapypics/IGRT.jpeg" },
+    { title: "VMAT", slug: "vmat", desc: t("treatments.vmat_desc"), icon: <Zap />, image: "/therapypics/VMAT.jpeg" },
+    { title: "SBRT", slug: "sbrt", desc: t("treatments.sbrt_desc"), icon: <CircleDot />, image: "/therapypics/SBRT.jpeg" },
+    { title: "SRS", slug: "srs-srt", desc: t("treatments.srs_desc"), icon: <BrainCircuit />, image: "/therapypics/SRS.jpeg" },
+    { title: "3D-CRT", slug: "3d-crt", desc: t("treatments.crt_desc"), icon: <Dna /> },
+    { title: t("treatments.brachy_title"), slug: "brachytherapy", desc: t("treatments.brachy_desc"), icon: <ShieldPlus /> },
+    { title: t("treatments.palliative_title"), slug: "palliative-radiotherapy", desc: t("treatments.palliative_desc"), icon: <HeartPulse /> },
   ];
 
   return (
@@ -147,14 +148,18 @@ export default function TreatmentsGrid() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 perspective-1000">
           {treatments.map((treatment, idx) => (
-            <TiltCard 
+            <Link 
               key={idx}
-              title={treatment.title}
-              desc={treatment.desc}
-              icon={treatment.icon}
-              image={treatment.image}
-              onClick={() => treatment.image && setSelectedImage(treatment.image)}
-            />
+              href={`/treatments/${treatment.slug}`}
+              className="block h-full w-full"
+            >
+              <TiltCard 
+                title={treatment.title}
+                desc={treatment.desc}
+                icon={treatment.icon}
+                image={treatment.image}
+              />
+            </Link>
           ))}
         </div>
       </div>

@@ -5,7 +5,11 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: '/drsarthakkumarmohantylogin',
+      disallow: [
+        '/drsarthakkumarmohantylogin',
+        '/drsarthakkumarmohantylogin/',
+        '/api/',
+      ],
     },
     sitemap: 'https://drsarthakkumarmohanty.in/sitemap.xml',
   }

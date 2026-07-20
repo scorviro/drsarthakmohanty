@@ -28,7 +28,21 @@ export const metadata: Metadata = {
     shortcut: "/favicon.svg",
     apple: "/favicon.svg",
   },
-  keywords: ["Radiation Oncologist Rajkot", "Cancer Treatment Gujarat", "SBRT", "IMRT", "VMAT", "HCG Cancer Centre", "Dr. Sarthak Kumar Mohanty"],
+  keywords: [
+    "Radiation Oncologist Rajkot",
+    "Cancer Treatment Gujarat",
+    "SBRT",
+    "IMRT",
+    "VMAT",
+    "HCG Cancer Centre",
+    "Sarthak Mohanty",
+    "Dr. Sarthak Kumar Mohanty",
+    "Dr. Sarthak Mohanty",
+    "Dr Sarthak Mohanty",
+    "Dr. Sarthak Kumar Mohanty oncologist",
+    "drsarthakkumarmohanty",
+    "drsarthakmohanty"
+  ],
   authors: [{ name: "Dr. Sarthak Kumar Mohanty" }],
   creator: "Dr. Sarthak Kumar Mohanty",
   openGraph: {
@@ -65,11 +79,23 @@ const schemaData = {
       "@type": "Physician",
       "@id": "https://drsarthakkumarmohanty.in/#physician",
       "name": "Dr. Sarthak Kumar Mohanty",
+      "alternateName": [
+        "Dr. Sarthak Mohanty",
+        "Dr Sarthak Mohanty",
+        "Dr. Sarthak Kumar Mohanty",
+        "Sarthak Mohanty"
+      ],
       "image": "https://drsarthakkumarmohanty.in/dr-sarthak-hero.jpg",
       "url": "https://drsarthakkumarmohanty.in",
       "telephone": "+918238286706",
       "medicalSpecialty": "Oncologic",
       "description": "Dr. Sarthak Kumar Mohanty is a highly accomplished Senior Radiation Oncologist in Rajkot, specializing in precision cancer care, advanced radiotherapy technologies (SBRT, IMRT, VMAT, and IGRT).",
+      "sameAs": [
+        "https://www.linkedin.com/in/dr-sarthak-kumar-mohanty",
+        "https://www.practo.com/rajkot/doctor/dr-sarthak-kumar-mohanty",
+        "https://www.justdial.com/Rajkot/Dr-Sarthak-Kumar-Mohanty-Gandhigram/0281PX281-X281-220716172605-B9E4_BZDET",
+        "https://www.facebook.com/sarthak.mohanty"
+      ],
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "HCG Cancer Centre, Ayodhya Chowk, 150 Feet Ring Road",
@@ -83,6 +109,32 @@ const schemaData = {
         "latitude": "22.3168",
         "longitude": "70.7749"
       },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "34",
+        "bestRating": "5"
+      },
+      "review": [
+        {
+          "@type": "Review",
+          "author": { "@type": "Person", "name": "haresh talatia" },
+          "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+          "reviewBody": "For my father's cancer treatment by the grace of God we reached to Dr.Mohanty Sir, were he treated my father very patiently, kindly, thoroughly, and accurately and made my father cancer free."
+        },
+        {
+          "@type": "Review",
+          "author": { "@type": "Person", "name": "Bhavesh Soni" },
+          "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+          "reviewBody": "My relative rameshbhai barbhaya need treatment so we reached at dr sarthakji who is very good doctor with have pure heart toward patients and the way dr help us its feel like we are blessed."
+        },
+        {
+          "@type": "Review",
+          "author": { "@type": "Person", "name": "Ashish Jobanputra" },
+          "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+          "reviewBody": "Dr. Sarthak has treated my 12 year old daughter. He made her comfortable during radiation. Very supportive and helpful in nature with great knowledge."
+        }
+      ],
       "alumniOf": {
         "@type": "EducationalOrganization",
         "name": "Acharya Harihar Regional Cancer Centre (AHRCC)"

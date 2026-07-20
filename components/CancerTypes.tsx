@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function CancerTypes() {
   const { t } = useLanguage();
@@ -12,37 +13,37 @@ export default function CancerTypes() {
       name: t("cancer_types.head_neck"), 
       types: t("cancer_types.head_neck_types"), 
       image: "/therapypics/Headandneck.jpeg",
-      link: "https://en.wikipedia.org/wiki/Head_and_neck_cancer"
+      link: "/cancer-types/head-neck-cancer"
     },
     { 
       name: t("cancer_types.breast"), 
       types: t("cancer_types.breast_types"), 
       image: "/therapypics/breast.jpeg",
-      link: "https://en.wikipedia.org/wiki/Breast_cancer"
+      link: "/cancer-types/breast-cancer"
     },
     { 
       name: t("cancer_types.brain_spine"), 
       types: t("cancer_types.brain_spine_types"), 
       image: "/therapypics/brain.jpg",
-      link: "https://en.wikipedia.org/wiki/Brain_tumor"
+      link: "/cancer-types/brain-spine-tumor"
     },
     { 
       name: t("cancer_types.genitourinary"), 
       types: t("cancer_types.genitourinary_types"), 
       image: "/therapypics/prostate.jpeg",
-      link: "https://en.wikipedia.org/wiki/Clinical_Genitourinary_Cancer"
+      link: "/cancer-types/genitourinary-cancer"
     },
     { 
       name: t("cancer_types.thoracic"), 
       types: t("cancer_types.thoracic_types"), 
       image: "/therapypics/thoracic.jpeg",
-      link: "https://en.wikipedia.org/wiki/Lung_cancer"
+      link: "/cancer-types/thoracic-lung-cancer"
     },
     { 
       name: t("cancer_types.gynecological"), 
       types: t("cancer_types.gynecological_types"), 
       image: "/therapypics/gynaecologival.jpeg",
-      link: "https://en.wikipedia.org/wiki/Cervical_cancer"
+      link: "/cancer-types/gynecological-cancer"
     },
   ];
 
@@ -63,11 +64,9 @@ export default function CancerTypes() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {cancers.map((cancer, idx) => (
-            <a 
+            <Link 
               key={idx}
               href={cancer.link}
-              target="_blank"
-              rel="noopener noreferrer"
               className="block font-sans"
             >
               <motion.div
@@ -96,10 +95,10 @@ export default function CancerTypes() {
                     <ArrowUpRight size={18} className="text-brand-teal" />
                   </div>
                   <h3 className="text-2xl font-bold text-slate-900 mb-2 display-font">{cancer.name}</h3>
-                  <p className="text-slate-600 text-sm font-medium">{cancer.types}</p>
+                  <p className="text-slate-655 text-sm font-semibold">{cancer.types}</p>
                 </div>
               </motion.div>
-            </a>
+            </Link>
           ))}
         </div>
       </div>
