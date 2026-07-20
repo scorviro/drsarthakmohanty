@@ -293,7 +293,7 @@ export async function deleteAppointmentFromDb(appointmentId: string): Promise<bo
 // SETTINGS
 const defaultSettings: SystemSettings = {
   isBookingEnabled: true,
-  contactPhone: "+91 90992 41234",
+  contactPhone: "+91 82382 86706",
   clinicTimings: "Mon - Sat: 9:00 AM - 6:00 PM",
   showReviews: true,
 };
@@ -307,7 +307,7 @@ async function ensureSettingsTableExists() {
       CREATE TABLE IF NOT EXISTS settings (
         id INTEGER PRIMARY KEY DEFAULT 1,
         isBookingEnabled INTEGER NOT NULL DEFAULT 1,
-        contactPhone TEXT NOT NULL DEFAULT '+91 90992 41234',
+        contactPhone TEXT NOT NULL DEFAULT '+91 82382 86706',
         clinicTimings TEXT NOT NULL DEFAULT 'Mon - Sat: 9:00 AM - 6:00 PM',
         showReviews INTEGER NOT NULL DEFAULT 1
       )

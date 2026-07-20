@@ -17,7 +17,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://drsarthakmohanty.com'),
+  metadataBase: new URL('https://drsarthakkumarmohanty.in'),
   title: {
     default: "Dr. Sarthak Kumar Mohanty | Premium Radiation Oncologist in Rajkot",
     template: "%s | Dr. Sarthak Kumar Mohanty"
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_IN",
-    url: "https://drsarthakmohanty.com",
+    url: "https://drsarthakkumarmohanty.in",
     title: "Dr. Sarthak Kumar Mohanty | Radiation Oncologist",
     description: "Specialized radiation oncology care at HCG Cancer Centre, Rajkot. 15+ years of experience.",
     siteName: "Dr. Sarthak Kumar Mohanty",
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     images: ["/og-image.jpg"],
   },
   alternates: {
-    canonical: "https://drsarthakmohanty.com"
+    canonical: "https://drsarthakkumarmohanty.in"
   }
 };
 
@@ -62,10 +62,10 @@ const schemaData = {
   "@context": "https://schema.org",
   "@type": "MedicalBusiness",
   "name": "Dr. Sarthak Kumar Mohanty",
-  "image": "https://drsarthakmohanty.com/og-image.jpg",
-  "@id": "https://drsarthakmohanty.com",
-  "url": "https://drsarthakmohanty.com",
-  "telephone": "+919998290040",
+  "image": "https://drsarthakkumarmohanty.in/og-image.jpg",
+  "@id": "https://drsarthakkumarmohanty.in",
+  "url": "https://drsarthakkumarmohanty.in",
+  "telephone": "+918238286706",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Ayodhya Chowk, 150 Feet Ring Road",

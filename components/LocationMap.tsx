@@ -68,8 +68,7 @@ export default function LocationMap() {
                 </div>
                 <div>
                   <h4 className="text-slate-900 font-semibold mb-1">{t("location.contact_label")}</h4>
-                  <p className="text-slate-600 text-sm mb-1">{t("common.phone_val")}</p>
-                  <p className="text-slate-600 text-sm">{t("location.emergency_val")}</p>
+                  <p className="text-slate-600 text-sm">{t("common.phone_val")}</p>
                 </div>
               </div>
 
@@ -80,7 +79,6 @@ export default function LocationMap() {
                 <div>
                   <h4 className="text-slate-900 font-semibold mb-1">{t("location.timings_label")}</h4>
                   <p className="text-slate-600 text-sm">{t("location.timings_val")}</p>
-                  <p className="text-slate-600 text-sm">{t("location.sunday_closed")}</p>
                 </div>
               </div>
             </div>
@@ -94,9 +92,12 @@ export default function LocationMap() {
               >
                 {t("location.get_directions")}
               </a>
-              <button className="glass-panel text-slate-900 border border-slate-200 px-6 py-3 rounded-xl font-medium hover:bg-slate-50/50 transition-colors w-full sm:w-auto text-center">
+              <a 
+                href={`tel:${t("common.phone_val").replace(/\s+/g, '')}`}
+                className="glass-panel text-slate-900 border border-slate-200 px-6 py-3 rounded-xl font-medium hover:bg-slate-50/50 transition-colors w-full sm:w-auto text-center block"
+              >
                 {t("location.call_hospital")}
-              </button>
+              </a>
             </div>
             
           </div>

@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://drsarthakmohanty.com/sitemap.xml',
+    sitemap: 'https://drsarthakkumarmohanty.in/sitemap.xml',
   }
 }

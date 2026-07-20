@@ -142,7 +142,7 @@ export default function AdminPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [settings, setSettings] = useState<SystemSettings>({
     isBookingEnabled: true,
-    contactPhone: "+91 90992 41234",
+    contactPhone: "+91 82382 86706",
     clinicTimings: "Mon - Sat: 9:00 AM - 6:00 PM",
     showReviews: true
   });

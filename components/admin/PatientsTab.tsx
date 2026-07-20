@@ -850,7 +850,7 @@ export default function PatientsTab({ showToast }: PatientsTabProps) {
     doc.setFontSize(10);
     doc.setTextColor(241, 245, 249); // slate-100
     doc.text("Radiation Oncologist | Clinical & Precision Cancer Care Expert", 15, 24);
-    doc.text("Contact: +91 99982 90040 | Web: drsarthakmohanty.com", 15, 30);
+    doc.text("Contact: +91 82382 86706 | Web: drsarthakkumarmohanty.in", 15, 30);
 
     // Patient Case Details
     doc.setFont("Helvetica", "bold");

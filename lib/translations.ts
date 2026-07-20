@@ -3,7 +3,7 @@ export const translations = {
     common: {
       book_appointment: "Book Appointment",
       whatsapp_us: "WhatsApp Us",
-      phone_val: "+91 90992 41234",
+      phone_val: "+91 82382 86706",
       email_val: "sarthak1982@gmail.com",
     },
     nav: {
@@ -286,7 +286,7 @@ export const translations = {
     common: {
       book_appointment: "अपॉइंटमेंट बुक करें",
       whatsapp_us: "व्हाट्सएप करें",
-      phone_val: "+91 90992 41234",
+      phone_val: "+91 82382 86706",
       email_val: "sarthak1982@gmail.com",
     },
     nav: {
@@ -569,7 +569,7 @@ export const translations = {
     common: {
       book_appointment: "એપોઇન્ટમેન્ટ બુક કરો",
       whatsapp_us: "વોટ્સએપ કરો",
-      phone_val: "+91 90992 41234",
+      phone_val: "+91 82382 86706",
       email_val: "sarthak1982@gmail.com",
     },
     nav: {
