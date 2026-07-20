@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
+import Image from "next/image";
 
 export default function CancerTypes() {
   const { t } = useLanguage();
@@ -67,7 +68,7 @@ export default function CancerTypes() {
               href={cancer.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="block"
+              className="block font-sans"
             >
               <motion.div
                 whileHover={{ y: -10 }}
@@ -76,17 +77,21 @@ export default function CancerTypes() {
                 style={{ willChange: "transform" }}
               >
                 {/* Background Image with Overlay */}
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                  style={{ backgroundImage: `url(${cancer.image})`, filter: "none" }}
+                <Image
+                  src={cancer.image}
+                  alt={`${cancer.name} - Radiation Oncology Care by Dr. Sarthak Kumar Mohanty in Rajkot, Gujarat`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="absolute inset-0 object-cover transition-transform duration-700 group-hover:scale-110"
+                  loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#FAFAFA] via-brand-navy/80 to-transparent opacity-90 group-hover:opacity-75 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#FAFAFA] via-brand-navy/80 to-transparent opacity-90 group-hover:opacity-75 transition-opacity duration-500 z-10" />
 
                 {/* Teal Glow Overlay on Hover */}
-                <div className="absolute inset-0 bg-brand-teal/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 mix-blend-overlay" />
+                <div className="absolute inset-0 bg-brand-teal/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 mix-blend-overlay z-20" />
 
                 {/* Content */}
-                <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                <div className="absolute inset-0 p-8 flex flex-col justify-end z-30">
                   <div className="w-10 h-10 rounded-full glass-panel flex items-center justify-center mb-4 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
                     <ArrowUpRight size={18} className="text-brand-teal" />
                   </div>

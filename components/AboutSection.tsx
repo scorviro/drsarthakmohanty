@@ -67,7 +67,7 @@ export default function AboutSection() {
           <div className="space-y-6">
             <div className="flex items-center space-x-4">
               <div className="w-16 h-16 rounded-full border-2 border-brand-teal overflow-hidden">
-                <img src="/dr-sarthak-about.jpg" alt="Dr. Sarthak" className="w-full h-full object-cover object-top" />
+                <img src="/dr-sarthak-about.jpg" alt="Dr. Sarthak Kumar Mohanty - Radiation Oncologist, Rajkot" className="w-full h-full object-cover object-top" loading="lazy" />
               </div>
               <div>
                 <h3 className="font-serif font-bold text-slate-900 text-xl">Dr. Sarthak Kumar Mohanty</h3>
@@ -87,7 +87,7 @@ export default function AboutSection() {
               <div className="grid grid-cols-2 gap-2 text-xs text-slate-700 font-medium">
                 <div><strong>Hometown:</strong> Balasore, Odisha</div>
                 <div><strong>Marital Status:</strong> Married</div>
-                <div><strong>Contact:</strong> +91 8238386706</div>
+                <div><strong>Contact:</strong> +91 82382 86706</div>
                 <div><strong>Email:</strong> sarthak1982@gmail.com</div>
                 <div className="col-span-2 mt-1"><strong>Address:</strong> Savan Saffron Apartment, Raiya Road, Rajkot</div>
               </div>
@@ -383,8 +383,9 @@ export default function AboutSection() {
               {/* Parallax doctor portrait image */}
               <motion.img
                 src="/dr-sarthak-about.jpg"
-                alt="Dr. Sarthak Kumar Mohanty"
+                alt="Dr. Sarthak Kumar Mohanty - Precision Radiotherapy Expert in Rajkot"
                 style={{ y: yVal }}
+                loading="lazy"
                 className="absolute inset-0 w-full h-[115%] object-cover object-top filter contrast-[1.03] brightness-[1.01] transition-transform duration-700 ease-out group-hover:scale-105"
               />
               
@@ -516,7 +517,8 @@ export default function AboutSection() {
                       <div className="w-24 h-24 rounded-full border-4 border-amber-400/40 overflow-hidden shadow-xl">
                         <img 
                           src="/dr-sarthak-about.jpg" 
-                          alt="Dr. Sarthak"
+                          alt="Dr. Sarthak Kumar Mohanty - Senior Consultant Oncologist Rajkot"
+                          loading="lazy"
                           className="w-full h-full object-cover object-top"
                         />
                       </div>

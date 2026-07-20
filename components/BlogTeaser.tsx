@@ -16,11 +16,13 @@ import {
   X, 
   Clock, 
   ArrowRight, 
-  Check 
+  Check,
+  ExternalLink
 } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { educationArticles, categories, Article } from "@/lib/educationData";
 import Image from "next/image";
+import Link from "next/link";
 
 // Category Icons mapping
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -120,7 +122,7 @@ export default function BlogTeaser({ initialArticles = [] }: { initialArticles?:
   // Copy Link / Share Action
   const shareArticle = (article: Article, e: React.MouseEvent) => {
     e.stopPropagation();
-    const url = `${window.location.origin}/#patient-education?article=${article.slug}`;
+    const url = `${window.location.origin}/blog/${article.slug}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopiedId(article.id);
       setTimeout(() => setCopiedId(null), 2000);
@@ -461,7 +463,7 @@ export default function BlogTeaser({ initialArticles = [] }: { initialArticles?:
 
                         {/* Footer details */}
                         <div className="mt-12 pt-8 border-t border-slate-150 flex items-center justify-between">
-                          <div className="flex space-x-3">
+                          <div className="flex flex-wrap gap-3">
                             <button
                               onClick={(e) => toggleBookmark(activeArticle.id, e)}
                               className={`flex items-center space-x-2 px-4 py-2.5 rounded-2xl border text-sm font-semibold transition-colors ${bookmarks.includes(activeArticle.id) ? "bg-brand-teal/10 border-brand-teal/30 text-brand-teal" : "border-slate-200 text-slate-600 hover:bg-slate-50"}`}
@@ -485,6 +487,13 @@ export default function BlogTeaser({ initialArticles = [] }: { initialArticles?:
                                 </>
                               )}
                             </button>
+                            <Link
+                              href={`/blog/${activeArticle.slug}`}
+                              className="flex items-center space-x-2 px-4 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-semibold transition-colors"
+                            >
+                              <ExternalLink size={16} className="text-slate-400" />
+                              <span>View Dedicated Page</span>
+                            </Link>
                           </div>
                         </div>
 

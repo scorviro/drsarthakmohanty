@@ -60,22 +60,87 @@ export const metadata: Metadata = {
 
 const schemaData = {
   "@context": "https://schema.org",
-  "@type": "MedicalBusiness",
-  "name": "Dr. Sarthak Kumar Mohanty",
-  "image": "https://drsarthakkumarmohanty.in/og-image.jpg",
-  "@id": "https://drsarthakkumarmohanty.in",
-  "url": "https://drsarthakkumarmohanty.in",
-  "telephone": "+918238286706",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Ayodhya Chowk, 150 Feet Ring Road",
-    "addressLocality": "Rajkot",
-    "addressRegion": "Gujarat",
-    "postalCode": "360005",
-    "addressCountry": "IN"
-  },
-  "medicalSpecialty": "Oncologic",
-  "description": "Specialized radiation oncology care at HCG Cancer Centre, Rajkot. 15+ years of experience in SBRT, IMRT, VMAT, and IGRT."
+  "@graph": [
+    {
+      "@type": "Physician",
+      "@id": "https://drsarthakkumarmohanty.in/#physician",
+      "name": "Dr. Sarthak Kumar Mohanty",
+      "image": "https://drsarthakkumarmohanty.in/dr-sarthak-hero.jpg",
+      "url": "https://drsarthakkumarmohanty.in",
+      "telephone": "+918238286706",
+      "medicalSpecialty": "Oncologic",
+      "description": "Dr. Sarthak Kumar Mohanty is a highly accomplished Senior Radiation Oncologist in Rajkot, specializing in precision cancer care, advanced radiotherapy technologies (SBRT, IMRT, VMAT, and IGRT).",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "HCG Cancer Centre, Ayodhya Chowk, 150 Feet Ring Road",
+        "addressLocality": "Rajkot",
+        "addressRegion": "Gujarat",
+        "postalCode": "360005",
+        "addressCountry": "IN"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "22.3168",
+        "longitude": "70.7749"
+      },
+      "alumniOf": {
+        "@type": "EducationalOrganization",
+        "name": "Acharya Harihar Regional Cancer Centre (AHRCC)"
+      },
+      "knowsAbout": [
+        "Radiation Oncology",
+        "Cancer Treatment",
+        "Stereotactic Body Radiotherapy (SBRT)",
+        "Intensity-Modulated Radiation Therapy (IMRT)",
+        "Volumetric Modulated Arc Therapy (VMAT)",
+        "Image-Guided Radiation Therapy (IGRT)",
+        "Brachytherapy"
+      ],
+      "hospitalAffiliation": {
+        "@type": "Hospital",
+        "name": "HCG Cancer Centre, Rajkot",
+        "url": "https://drsarthakkumarmohanty.in"
+      },
+      "priceRange": "$$",
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday"
+          ],
+          "opens": "09:00",
+          "closes": "18:00"
+        }
+      ]
+    },
+    {
+      "@type": "MedicalBusiness",
+      "@id": "https://drsarthakkumarmohanty.in/#clinic",
+      "name": "Dr. Sarthak Kumar Mohanty - Cancer Care",
+      "image": "https://drsarthakkumarmohanty.in/og-image.jpg",
+      "url": "https://drsarthakkumarmohanty.in",
+      "telephone": "+918238286706",
+      "logo": "https://drsarthakkumarmohanty.in/favicon.svg",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Ayodhya Chowk, 150 Feet Ring Road",
+        "addressLocality": "Rajkot",
+        "addressRegion": "Gujarat",
+        "postalCode": "360005",
+        "addressCountry": "IN"
+      },
+      "priceRange": "$$",
+      "parentOrganization": {
+        "@type": "MedicalOrganization",
+        "name": "HCG Cancer Centre, Rajkot"
+      }
+    }
+  ]
 };
 
 export default function RootLayout({
