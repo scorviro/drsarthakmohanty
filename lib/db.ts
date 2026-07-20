@@ -322,14 +322,17 @@ export async function getDbSettings(): Promise<SystemSettings> {
   try {
     await ensureSettingsTableExists();
     const results = await db.select().from(schema.settings).where(eq(schema.settings.id, 1));
-    if (results.length === 0) {
-      await db.insert(schema.settings).values({ id: 1, ...defaultSettings });
-      return defaultSettings;
-    }
-    return results[0] as SystemSettings;
+    const settings = results.length === 0 ? defaultSettings : results[0] as SystemSettings;
+    return {
+      ...settings,
+      contactPhone: "+91 82382 86706",
+    };
   } catch (error) {
     console.error("Error reading database settings:", error);
-    return defaultSettings;
+    return {
+      ...defaultSettings,
+      contactPhone: "+91 82382 86706",
+    };
   }
 }
 
