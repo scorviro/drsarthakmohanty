@@ -40,7 +40,7 @@ export const appointments = sqliteTable("appointments", {
 export const settings = sqliteTable("settings", {
   id: integer("id").primaryKey().default(1),
   isBookingEnabled: integer("isBookingEnabled", { mode: "boolean" }).default(true).notNull(),
-  contactPhone: text("contactPhone").default("+91 99982 90040").notNull(),
+  contactPhone: text("contactPhone").default("+91 90992 41234").notNull(),
   clinicTimings: text("clinicTimings").default("Mon - Sat: 9:00 AM - 6:00 PM").notNull(),
   showReviews: integer("showReviews", { mode: "boolean" }).default(true).notNull(),
 });

@@ -3,8 +3,8 @@ export const translations = {
     common: {
       book_appointment: "Book Appointment",
       whatsapp_us: "WhatsApp Us",
-      phone_val: "+91 XXXXX XXXXX",
-      email_val: "consult@drsarthakmohanty.com",
+      phone_val: "+91 90992 41234",
+      email_val: "sarthak1982@gmail.com",
     },
     nav: {
       home: "Home",
@@ -237,7 +237,7 @@ export const translations = {
       address_label: "Address",
       address_val: "Ayodhya Chowk, 150 Feet Ring Road,\nRajkot, Gujarat 360005",
       contact_label: "Contact",
-      emergency_val: "Emergency: 1066",
+      emergency_val: "Emergency: +91 99780 12345",
       timings_label: "Consultation Timings",
       timings_val: "Mon - Sat: 10:00 AM - 5:00 PM",
       sunday_closed: "Sunday: Closed",
@@ -286,8 +286,8 @@ export const translations = {
     common: {
       book_appointment: "अपॉइंटमेंट बुक करें",
       whatsapp_us: "व्हाट्सएप करें",
-      phone_val: "+91 XXXXX XXXXX",
-      email_val: "consult@drsarthakmohanty.com",
+      phone_val: "+91 90992 41234",
+      email_val: "sarthak1982@gmail.com",
     },
     nav: {
       home: "होम",
@@ -520,7 +520,7 @@ export const translations = {
       address_label: "पता",
       address_val: "अयोध्या चौक, 150 फीट रिंग रोड,\nराजकोट, गुजरात 360005",
       contact_label: "संपर्क",
-      emergency_val: "आपातकालीन: 1066",
+      emergency_val: "आपातकालीन: +91 99780 12345",
       timings_label: "परामर्श का समय",
       timings_val: "सोम - शनि: सुबह 10:00 बजे - शाम 5:00 बजे",
       sunday_closed: "रविवार: बंद",
@@ -569,8 +569,8 @@ export const translations = {
     common: {
       book_appointment: "એપોઇન્ટમેન્ટ બુક કરો",
       whatsapp_us: "વોટ્સએપ કરો",
-      phone_val: "+91 XXXXX XXXXX",
-      email_val: "consult@drsarthakmohanty.com",
+      phone_val: "+91 90992 41234",
+      email_val: "sarthak1982@gmail.com",
     },
     nav: {
       home: "હોમ",
@@ -803,7 +803,7 @@ export const translations = {
       address_label: "સરનામું",
       address_val: "અયોધ્યા ચોક, 150 ફીટ રીંગ રોડ,\nરાજકોટ, ગુજરાત 360005",
       contact_label: "સંપર્ક",
-      emergency_val: "ઇમરજન્સી: 1066",
+      emergency_val: "ઇમરજન્સી: +91 99780 12345",
       timings_label: "પરામર્શ સમય",
       timings_val: "સોમ - શનિ: સવારે 10:00 થી સાંજે 5:00 વાગ્યા સુધી",
       sunday_closed: "રવિવાર: બંધ",

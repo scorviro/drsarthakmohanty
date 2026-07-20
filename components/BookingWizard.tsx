@@ -159,7 +159,7 @@ export default function BookingWizard() {
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl py-4 pl-12 pr-4 text-slate-900 focus:outline-none focus:border-brand-teal transition-colors placeholder-gray-600" 
-                          placeholder={t("common.phone_val")} 
+                          placeholder="+91 XXXXX XXXXX" 
                         />
                       </div>
                     </div>

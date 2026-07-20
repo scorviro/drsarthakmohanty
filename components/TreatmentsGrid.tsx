@@ -125,9 +125,9 @@ export default function TreatmentsGrid() {
     { title: "VMAT", desc: t("treatments.vmat_desc"), icon: <Zap />, image: "/therapypics/VMAT.jpeg" },
     { title: "SBRT", desc: t("treatments.sbrt_desc"), icon: <CircleDot />, image: "/therapypics/SBRT.jpeg" },
     { title: "SRS", desc: t("treatments.srs_desc"), icon: <BrainCircuit />, image: "/therapypics/SRS.jpeg" },
-    { title: "3D-CRT", desc: t("treatments.crt_desc"), icon: <Dna />, image: "/therapypics/3D-CRT.jpeg" },
-    { title: t("treatments.brachy_title"), desc: t("treatments.brachy_desc"), icon: <ShieldPlus />, image: "/therapypics/Brachytherapy.jpeg" },
-    { title: t("treatments.palliative_title"), desc: t("treatments.palliative_desc"), icon: <HeartPulse />, image: "/therapypics/Palliative Care.jpeg" },
+    { title: "3D-CRT", desc: t("treatments.crt_desc"), icon: <Dna /> },
+    { title: t("treatments.brachy_title"), desc: t("treatments.brachy_desc"), icon: <ShieldPlus /> },
+    { title: t("treatments.palliative_title"), desc: t("treatments.palliative_desc"), icon: <HeartPulse /> },
   ];
 
   return (
@@ -153,7 +153,7 @@ export default function TreatmentsGrid() {
               desc={treatment.desc}
               icon={treatment.icon}
               image={treatment.image}
-              onClick={() => setSelectedImage(treatment.image)}
+              onClick={() => treatment.image && setSelectedImage(treatment.image)}
             />
           ))}
         </div>

@@ -58,10 +58,6 @@ export default function CancerTypes() {
               {t("cancer_types.sub_heading")} <span className="text-gradient-teal">{t("cancer_types.sub_heading_gradient")}</span> {t("cancer_types.focus")}
             </h2>
           </div>
-          <button className="glass-panel text-slate-900 px-6 py-3 rounded-full text-sm font-medium hover:bg-slate-100 transition-colors flex items-center space-x-2 w-max border border-slate-200">
-            <span>{t("cancer_types.view_all")}</span>
-            <ArrowUpRight size={16} />
-          </button>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -136,7 +136,8 @@ export default function Navbar() {
             animate={{ opacity: 1, height: "100vh" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden absolute top-0 left-0 right-0 bg-[#019E88]/98 backdrop-blur-lg border-t border-[#017C6B]/20 h-screen overflow-y-auto z-40 pt-24"
+            style={{ backgroundColor: "#019E88", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)" }}
+            className="md:hidden absolute top-0 left-0 right-0 border-t border-[#017C6B]/20 h-screen overflow-y-auto z-40 pt-24"
             data-lenis-prevent
           >
             <div className="flex flex-col px-6 space-y-6">

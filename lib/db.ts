@@ -293,13 +293,34 @@ export async function deleteAppointmentFromDb(appointmentId: string): Promise<bo
 // SETTINGS
 const defaultSettings: SystemSettings = {
   isBookingEnabled: true,
-  contactPhone: "+91 99982 90040",
+  contactPhone: "+91 90992 41234",
   clinicTimings: "Mon - Sat: 9:00 AM - 6:00 PM",
   showReviews: true,
 };
 
+let settingsTableEnsured = false;
+
+async function ensureSettingsTableExists() {
+  if (settingsTableEnsured) return;
+  try {
+    await client.execute(`
+      CREATE TABLE IF NOT EXISTS settings (
+        id INTEGER PRIMARY KEY DEFAULT 1,
+        isBookingEnabled INTEGER NOT NULL DEFAULT 1,
+        contactPhone TEXT NOT NULL DEFAULT '+91 90992 41234',
+        clinicTimings TEXT NOT NULL DEFAULT 'Mon - Sat: 9:00 AM - 6:00 PM',
+        showReviews INTEGER NOT NULL DEFAULT 1
+      )
+    `);
+    settingsTableEnsured = true;
+  } catch (error) {
+    console.error("Failed to ensure settings table exists:", error);
+  }
+}
+
 export async function getDbSettings(): Promise<SystemSettings> {
   try {
+    await ensureSettingsTableExists();
     const results = await db.select().from(schema.settings).where(eq(schema.settings.id, 1));
     if (results.length === 0) {
       await db.insert(schema.settings).values({ id: 1, ...defaultSettings });
@@ -314,6 +335,7 @@ export async function getDbSettings(): Promise<SystemSettings> {
 
 export async function saveDbSettings(settingsData: SystemSettings): Promise<boolean> {
   try {
+    await ensureSettingsTableExists();
     const results = await db.select().from(schema.settings).where(eq(schema.settings.id, 1));
     if (results.length === 0) {
       await db.insert(schema.settings).values({ id: 1, ...settingsData });
