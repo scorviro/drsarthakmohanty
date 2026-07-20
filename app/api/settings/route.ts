@@ -44,14 +44,10 @@ export async function PUT(request: Request) {
       showReviews: typeof showReviews === "boolean" ? showReviews : currentSettings.showReviews,
     };
 
-    const success = await saveDbSettings(updatedSettings);
-    if (!success) {
-      return NextResponse.json({ error: "Failed to write settings to database." }, { status: 500 });
-    }
-
+    await saveDbSettings(updatedSettings);
     return NextResponse.json({ success: true, settings: updatedSettings });
-  } catch (error) {
+  } catch (error: any) {
     logError("PUT settings error", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error?.message || "Failed to save settings." }, { status: 500 });
   }
 }

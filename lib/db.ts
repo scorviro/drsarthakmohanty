@@ -348,7 +348,7 @@ export async function saveDbSettings(settingsData: SystemSettings): Promise<bool
     return true;
   } catch (error) {
     console.error("Error writing settings:", error);
-    return false;
+    throw error;
   }
 }
 export async function getDbValue(key: string, defaultValue: any): Promise<any> {
